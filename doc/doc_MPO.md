@@ -40,7 +40,9 @@ Control as inferenceは部分観測性などを含めて問題を拡張するこ
 
 #### 最適性確率変数
 
-このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\pmb{s}_t$においてアクション $\bm{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\bm{s}_t, \bm{a}_t)$ となります。
+このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。直感的には $\mathcal{O}$ は、（行動を選択することにより）最大の報酬を獲得できるイベントとして解釈可能です。もしくは、強化学習タスクを成功させるイベントとしても捉えられるかもしれません[2]。
+
+この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\pmb{s}_t$においてアクション $\pmb{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\pmb{s}_t, \pmb{a}_t)$ となります。
 
 ![](imgs/最適制御確率変数_グラフィカルモデル.png)
 
@@ -67,12 +69,29 @@ $$\begin{align}
 ここで、 $p(\mathcal{O}=1|\tau) \propto \exp{\sum_t \frac{r_t}{\alpha}}$ となること、すなわちトラジェクトリが最適である確率 $p$ が $\tau$ の報酬和と指数比例することを想定すると、
 
 $$\begin{align}
-&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}\\
+&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau} \tag{4}\\
 &=E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
 &=E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
 \end{align}$$
 
 と変形できます。ここで $\alpha$ は温度パラメータであり、報酬 $r_t$ をスケーリングする役割を持ちます。またこのとき $p, q$ はいずれも方策分布を表します。上式から、報酬和が高いほど最適トラジェクトリである確率が指数的に高まることがわかります。
+
+次に方策のパラメタ $p_\pi(\tau)$ を $p_\pi(\tau)=p(\tau|\pmb\theta)p(\pmb\theta)$ として具体化し、式 $(4)$ の第二項を書き直すと
+
+$$\begin{align}
+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}&=\int{q(\tau)\log \frac{p(\tau|\pmb\theta)p(\pmb\theta)}{q(\tau)}d\tau}\\
+&=\int{q(\tau)\log \frac{p(\tau|\pmb\theta)}{q(\tau)}d\tau} + \log p(\pmb\theta)
+\end{align}$$
+
+ここで $\int q(\tau)d\tau=1$ です。上式の第一項はKLダイバージェンス $KL(q(\tau)||p_\pi(\tau|\pmb\theta))$ と同様の形式( $-KL(\cdot)$ )ですが、トラジェクトリ $\tau$ は扱いが困難です。ここでトラジェクトリのKLダイバージェンスは各行動ステップのダイバージェンスに分解できると**想定すれば**（若干ここに無理があるようですが）、上式は
+
+$$\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}=E_{\tau\sim q}\left[-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)$$
+
+となります。上式および式 $(4)$ から、方策 $\pi$ で行動決定を実行したときにそれが**最適制御である確率** $p_\pi(\mathcal O=1)$ **の下界** $\mathcal J$ を
+
+$$\mathcal J(q,\pmb\theta)=E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)$$
+
+として規定でき、 $\mathcal J$ を任意の確率分布（今回は方策分布） $q$ と方策パラメータ $\pmb\theta$ で表現することができました。
 
 ## 参考文献
 
