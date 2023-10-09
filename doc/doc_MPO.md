@@ -39,7 +39,7 @@ Control as inferenceは部分観測性などを含めて問題を拡張するこ
 
 #### 最適性確率変数
 
-このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\bm s_t$においてアクション $\bm a_t$ が最適行動である確率は $p(\mathcal O_t=1|\bm s_t, \bm a_t)$ となります。
+このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\bm{s}_t$においてアクション $\bm{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\bm{s}_t, \bm{a}_t)$ となります。
 
 ![](imgs/最適制御確率変数_グラフィカルモデル.png)
 
@@ -61,23 +61,26 @@ $$\begin{align}
 &=\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}
 \end{align}$$
 
-が成立します。第一項はトラジェクトリ $\tau$ が $q$ に従って生成されるときに、$\tau$ が最適である確率の期待値を意味します。
+が成立します。第一項はトラジェクトリ $\tau$ が $q$ に従って生成されるときに、 $\tau$ が最適である確率の期待値を意味します。
 
 ここで、トラジェクトリが最適である確率 $p(\mathcal O=1|\tau)$ が $\tau$ の報酬和と指数比例すると想定すると、
 
 $$\begin{align}
-&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}\\
+&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau} \tag{4}\\
 &=E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
 &=E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
 \end{align}$$
 
-このとき、$p,q$ はいずれも方策分布を表します。
+このとき、 $p$、$q$ はいずれも方策分布を表します。
 
 ## 参考文献
 
 [1] [強化学習 as Inference： Maximum a Posteriori Policy Optimizationの実装](https://horomary.hatenablog.com/entry/2022/07/21/192741)
+
 [2] [Maximum a Posteriori Policy Optimization](https://openreview.net/forum?id=S1ANxQW0b)
+
 [3] [Trust Region Policy Optimization (2015)](https://arxiv.org/abs/1502.05477)
+
 [4] [Control as Inference, mendy, Speaker Deck](https://speakerdeck.com/shunichi09/sergey-levine-lecture-remake-14th-control-as-inference?slide=5)
 
 ## Appendix
@@ -89,9 +92,9 @@ $$\begin{align}
 
 *objective*とは強化学習の目的関数のことであり、エージェントが最大化しようとする長期的な報酬の期待値です。一般に、以下のような式で表されます。
 
-$$J(\pi) = E_\pi [\sum_{t=0}^{\infin} \gamma^t r(s_t,a_t)]$$
+$$J(\pi) = E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 
-ここで、$\pi$ はエージェントのポリシー、$\gamma$ は割引率、$r(s_t,a_t)$ は状態 $s_t$ で 行動 $a_t$ を取った時にエージェントが得られる報酬です。
+ここで、 $\pi$ はエージェントのポリシー、 $\gamma$ は割引率、 $r(s_t,a_t)$ は状態 $s_t$ で 行動 $a_t$ を取った時にエージェントが得られる報酬です。
 
 すなわち、目的関数 $J(\pi)$ は、エージェントがポリシー $\pi$ に従って行動したときに、未来に得られる報酬の割引和の期待値を表しています。
 
@@ -99,10 +102,9 @@ $$J(\pi) = E_\pi [\sum_{t=0}^{\infin} \gamma^t r(s_t,a_t)]$$
 
 調べていてわからなかった数式の表現を以下に記載します。
 
-<!-- omit in toc -->
-#### $\log{p_\pi(\mathcal{O}=1)}$
+- $\log{p_\pi(\mathcal{O}=1)}$
 
-方策 $\pi$ の下で最適なアクションを撮る確率は $p_\pi(\mathcal{O}=1)$で表されます。これに対して$\log$ を使用することで、勾配の計算を簡素化し、数値的な問題を回避させています[A1]。より具体的には、勾配と除算を用いた（数学的に同一な）式に比べて、数値的に安定する傾向があるようです。
+方策 $\pi$ の下で最適なアクションを撮る確率は $p_\pi(\mathcal{O}=1)$で表されます。これに対して $\log$ を使用することで、勾配の計算を簡素化し、数値的な問題を回避させています[A1]。より具体的には、勾配と除算を用いた（数学的に同一な）式に比べて、数値的に安定する傾向があるようです。
 
 ### 参考文献（Appendix）
 
