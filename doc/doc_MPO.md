@@ -13,6 +13,7 @@
   - [参考文献](#参考文献)
   - [Appendix](#appendix)
     - [用語の解説](#用語の解説)
+      - [KLダイバージェンス](#klダイバージェンス)
     - [数式の説明](#数式の説明)
     - [参考文献（Appendix）](#参考文献appendix)
 
@@ -39,7 +40,7 @@ Control as inferenceは部分観測性などを含めて問題を拡張するこ
 
 #### 最適性確率変数
 
-このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\bm{s}_t$においてアクション $\bm{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\bm{s}_t, \bm{a}_t)$ となります。
+このフレームワークにいて最も重要なコンセプトは**最適性確率変数**$\mathcal O$です。この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\pmb{s}_t$においてアクション $\bm{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\bm{s}_t, \bm{a}_t)$ となります。
 
 ![](imgs/最適制御確率変数_グラフィカルモデル.png)
 
@@ -63,15 +64,15 @@ $$\begin{align}
 
 が成立します。第一項はトラジェクトリ $\tau$ が $q$ に従って生成されるときに、 $\tau$ が最適である確率の期待値を意味します。
 
-ここで、トラジェクトリが最適である確率 $p(\mathcal O=1|\tau)$ が $\tau$ の報酬和と指数比例すると想定すると、
+ここで、 $p(\mathcal{O}=1|\tau) \propto \exp{\sum_t \frac{r_t}{\alpha}}$ となること、すなわちトラジェクトリが最適である確率 $p$ が $\tau$ の報酬和と指数比例することを想定すると、
 
 $$\begin{align}
-&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau} \tag{4}\\
+&\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}\\
 &=E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
 &=E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
 \end{align}$$
 
-このとき、 $p$、$q$ はいずれも方策分布を表します。
+と変形できます。ここで $\alpha$ は温度パラメータであり、報酬 $r_t$ をスケーリングする役割を持ちます。またこのとき $p, q$ はいずれも方策分布を表します。上式から、報酬和が高いほど最適トラジェクトリである確率が指数的に高まることがわかります。
 
 ## 参考文献
 
@@ -98,6 +99,15 @@ $$J(\pi) = E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 
 すなわち、目的関数 $J(\pi)$ は、エージェントがポリシー $\pi$ に従って行動したときに、未来に得られる報酬の割引和の期待値を表しています。
 
+<!-- omit in toc-->
+#### KLダイバージェンス
+
+*Kullback-Leivler divergence*（KLダイバージェンス）とは、2つの確率分布がどの程度似ているかを表す尺度です。定義は下記の通りです[A2]。
+
+$$KL(p||q)=\int_{-\infty}^\infty {p(x)\log{\dfrac{p(x)}{q(x)}}}dx$$
+
+重要な特性として、**同じ確率分布では0になる**点（ $KL(p||p)=0$ ）、常に0以上の値を取り、**似ていないほど大きな値を取る**点が挙げられます。
+
 ### 数式の説明
 
 調べていてわからなかった数式の表現を以下に記載します。
@@ -109,3 +119,4 @@ $$J(\pi) = E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 ### 参考文献（Appendix）
 
 [A1] [What is log probability in policy gradient (reinforcement learning)?](https://www.quora.com/What-is-log-probability-in-policy-gradient-reinforcement-learning)
+[A2] [正規分布間のKLダイバージェンス](https://qiita.com/ceptree/items/9a473b5163d5655420e8)
