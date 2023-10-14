@@ -7,6 +7,7 @@
   - [概要](#概要)
   - [はじめに](#はじめに)
   - [理論](#理論)
+    - [環境設定](#環境設定)
     - [Control as inferenceとは（概要）](#control-as-inferenceとは概要)
       - [最適性確率変数](#最適性確率変数)
     - [最適制御確率の下界の導出](#最適制御確率の下界の導出)
@@ -30,7 +31,7 @@
 
 ## 概要
 
-**Maximum a Posteriori Policy Optimization**(MPO, [2])とは、**ICLR2018**で発表された、方策が最適である確率の下界を最大化する強化学習手法です。
+**Maximum a Posteriori Policy Optimization**(MPO, [1])とは、**ICLR2018**で発表された、方策が最適である確率の下界を最大化する強化学習手法です。
 
 ## はじめに
 
@@ -39,6 +40,16 @@
 MPOは方策勾配法ではなく**Control as Inference**、すなわち確率推論のフレーうワークで制御ポリシーを訓練する手法です。MPOはオフポリシーであるため**サンプル効率が良好**であり、また信頼領域法を用いるため**ロバストな更新**を実現しています。
 
 ## 理論
+
+### 環境設定
+
+割引強化報酬（RL）問題の最適な方策（ポリシー） $\pi$ を見つける問題を、**マルコフ決定過程**（MDP）によってモデル化します。MDPは、（連続）状態 $s$ 、アクション $a$ 、遷移確率 $p(s_{t+1}|s_t,a_t)$ 、報酬関数 $r(s,a)\in\mathbb{R}$ 、および割引率 $\gamma\in[0,1)$ から構成されます。また、ポリシー $\pi(a|s,\pmb\theta)$ （パラメタは $\pmb\theta$ ）は、任意の状態に対してアクション選択のための確率分布を指定すると仮定し、遷移確率とともに定常分布 $\mu_\pi(s)$ を作ります。
+
+> 遷移確率 $p(s_{t+1}|s_t,a_t)$ は、状態 $s_t$ から $s_{t+1}$ への行動 $a_t$ による遷移確率を指定します。
+
+> 定常分布とは、任意の状態 $s$ から開始した場合の、無限時間経過後の状態分布のこと[5]
+
+これらのパラメタを用いて、ポリシー $\pi$ に従った際の軌跡（トラジェクトリ） $\tau_\pi=\{(s_0,a_0)...(s_T,a_T)\}$ が定義されます。すなわち、トラジェクトリは $p_\pi(\tau)=p(s_0)\prod_{t>0}p(s_{t+1}|s_t,a_t)\pi(a_t|s_t)$ を用いて、 $\tau_\pi\sim p_\pi(\tau)$ と定義されます。期待収益は $\mathbb E_{\tau_\pi}\left[\sum_{t=0}^\infty\gamma^tr(s_t,a_t)\right]$ となります。ここで、以下では $r_t=r(s_t,a_t)$ として扱います。
 
 ### Control as inferenceとは（概要）
 
@@ -50,13 +61,13 @@ Control as inferenceは部分観測性などを含めて問題を拡張するこ
 
 #### 最適性確率変数
 
-このフレームワークにいて最も重要なコンセプトは**最適性確率変数** $\mathcal O$ です。直感的には $\mathcal{O}$ は、（行動を選択することにより）最大の報酬を獲得できるイベントとして解釈可能です。もしくは、強化学習タスクを成功させるイベントとしても捉えられるかもしれません[2]。
+このフレームワークにいて最も重要なコンセプトは**最適性確率変数** $\mathcal O$ です。直感的には $\mathcal{O}$ は、（行動を選択することにより）最大の報酬を獲得できるイベントとして解釈可能です。もしくは、強化学習タスクを成功させるイベントとしても捉えられるかもしれません[1]。
 
-この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $\pmb{s}_t$においてアクション $\pmb{a}_t$ が最適行動である確率は $p(\mathcal O_t=1|\pmb{s}_t, \pmb{a}_t)$ となります。
+この手法では行動の最適性を確率分布で表現します。例えばあるトラジェクトリ $\tau$ が与えられたとき、それが最適トラジェクトリである確率は $p(\mathcal O=1|\tau)$、そうでない確率は $p(\mathcal O=0|\tau)$ と表現されます。同様に、状態 $s_t$においてアクション $a_t$ が最適行動である確率は $p(\mathcal O_t=1|s_t, a_t)$ となります。
 
 ![](imgs/最適制御確率変数_グラフィカルモデル.png)
 
-最適性確率変数導入の最大のメリットは、MDPにおける「最適な制御」をグラフィカルに表現できるようになることです。これにより行動の最適性を明示的に確率分布で表現でき、環境の不確実性を自然に扱えるようになります。また、確率推論のさまざまなツールを利用可能になるのも大きなメリットであり、実際にMPOではEMアルゴリズムやELBOなどを活用しています[1]。
+最適性確率変数導入の最大のメリットは、MDPにおける「最適な制御」をグラフィカルに表現できるようになることです。これにより行動の最適性を明示的に確率分布で表現でき、環境の不確実性を自然に扱えるようになります。また、確率推論のさまざまなツールを利用可能になるのも大きなメリットであり、実際にMPOではEMアルゴリズムやELBOなどを活用しています[2]。
 
 ### 最適制御確率の下界の導出
 
@@ -74,38 +85,35 @@ $$\begin{align}
 &=\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}
 \end{align}$$
 
-が成立します<sup>[式変形の補足](#補足イェンセンの不等式を利用した式変形)</sup>。このうち、第一項はトラジェクトリ $\tau$ が $q$ に従って生成されるときに、 $\tau$ が最適である確率の期待値を意味します。
+が成立します<sup>[式変形の補足](#補足イェンセンの不等式を利用した式変形)</sup>[1, Equ.1]。このうち、第一項はトラジェクトリ $\tau$ が $q$ に従って生成されるときに、 $\tau$ が最適である確率の期待値を意味します。
 
-ここで、 $p(\mathcal{O}=1|\tau) \propto \exp{\sum_t \frac{r_t}{\alpha}}$ となること、すなわちトラジェクトリが最適である確率 $p$ が $\tau$ の報酬和と指数比例することを想定する<sup>[補足](#補足なぜ報酬和と指数比例)</sup>と、
+ここで、尤度関数 $p(\mathcal{O}=1|\tau) \propto \exp{\sum_t \frac{r_t}{\alpha}}$ を、すなわちトラジェクトリが最適である確率 $p$ が $\tau$ の報酬和と指数比例することを想定する<sup>[補足](#補足なぜ報酬和と指数比例)</sup>と、
 
 $$\begin{align}
 &\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau} \tag{4}\\
-&=E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
-&=E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
+&=\mathbb E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
+&=\mathbb E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
 \end{align}$$
 
-と変形できます。ここで $\alpha$ は温度パラメータであり、報酬 $r_t$ をスケーリングする役割を持ちます。またこのとき $p, q$ はいずれも方策分布を表します。上式から、報酬和が高いほど最適トラジェクトリである確率が指数的に高まることがわかります。
+と変形できます。ここで $\alpha$ は温度パラメータであり、報酬 $r_t$ をスケーリングする役割を持ちます。このとき $p, q$ はいずれも方策分布を表します。上式から、報酬和が高いほど最適トラジェクトリである確率が指数的に高まることがわかります。上式の第二項はKLダイバージェンス<sup>[補足](#補足klダイバージェンス)</sup> $KL(q(\tau)||p_\pi(\tau|\pmb\theta))$ と同様の形式( $-KL(\cdot)$ )ですから、
 
-次に方策のパラメタ $p_\pi(\tau)$ を $p_\pi(\tau)=p(\tau|\pmb\theta)p(\pmb\theta)$ として具体化し、式 $(4)$ の第二項を書き直すと
+$$\log{p_\pi(\mathcal O=1)}=\mathbb E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}\right]-KL(q(\tau)||p_\pi(\tau|\pmb\theta))$$
 
-$$\begin{align}
-\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}&=\int{q(\tau)\log \frac{p(\tau|\pmb\theta)p(\pmb\theta)}{q(\tau)}d\tau}\\
-&=\int{q(\tau)\log \frac{p(\tau|\pmb\theta)}{q(\tau)}d\tau} + \log p(\pmb\theta)
-\end{align}$$
+とできます[1, Equ.2]。尤度関数を介して確率モデルを構築することにより、推論問題として扱うことができるようになりました。ここで、直感的には、 $\mathcal O$ **は、アクションを選択することにより最大の報酬を獲得するイベント**として解釈できます。
 
-ここで $\int q(\tau)d\tau=1$ です。上式の第一項はKLダイバージェンス<sup>[補足](#補足klダイバージェンス)</sup> $KL(q(\tau)||p_\pi(\tau|\pmb\theta))$ と同様の形式( $-KL(\cdot)$ )ですが、トラジェクトリ $\tau$ は扱いが困難です。ここでトラジェクトリのKLダイバージェンスは各行動ステップのダイバージェンスに分解できると**想定すれば**（若干ここに無理があるようですが）、上式は
+トラジェクトリ $\tau$ は扱いが困難です。ここでトラジェクトリのKLダイバージェンスは各行動ステップのダイバージェンスに分解できると**想定すれば**（若干ここに無理があるようですが）、上式は
 
-$$\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}=E_{\tau\sim q}\left[-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)$$
+$$\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}=\mathbb E_{\tau\sim q}\left[-KL(q(\cdot|s_t)||\pi(\cdot|s_t, \pmb\theta))\right] + \log p(\pmb\theta)$$
 
 となります。上式および式 $(4)$ から、方策 $\pi$ で行動決定を実行したときにそれが**最適制御である確率** $p_\pi(\mathcal O=1)$ **の下界** $\mathcal J$ を
 
-$$\mathcal J(q,\pmb\theta)=E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta) \tag{10}$$
+$$\mathcal J(q,\pmb\theta)=\mathbb E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta) \tag{10}$$
 
 として規定でき、目的関数<sup>[補足](#補足objective-目的関数)</sup> $\mathcal J$ を任意の確率分布（今回は方策分布） $q$ と方策パラメータ $\pmb\theta$ で表現することができました。
 
 > ここまでで、**方策** $\pi$ **で行動決定を実行した際に、それが最適制御である確率** $p_\pi(\mathcal{O}=1)$ **は** $\mathcal J$ **以上である**こと、すなわち
 >
-> $$\begin{align}p_\pi(\mathcal{O}=1)&\geq\mathcal J(q,\pmb\theta)\\&=E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)\end{align}$$
+> $$\begin{align}p_\pi(\mathcal{O}=1)&\geq\mathcal J(q,\pmb\theta)\\&=\mathbb E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)\end{align}$$
 >
 > となることを導出しました。
 
@@ -121,31 +129,32 @@ $$\mathcal J(q,\pmb\theta)=E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\c
 大まかに各ステップは上記の動作を行い、このステップを繰り返すことで $\mathcal{J}$ を最大化します。
 #### E-step
 
-Eステップでは方策パラメータ $\pmb\theta$ を定数とみなし、下界 $\mathcal{J}$ を最大化するような方策分布 $q$ を算出します。前節で導出した式 $(10)$ を用いれば<sup>[補足2](#補足argmaxの意味)</sup>
+Eステップでは方策パラメータ $\pmb\theta$ を定数とみなし、下界 $\mathcal{J}$ を最大化するような方策分布 $q$ を算出します。前節で導出した式 $(10)$ を用いれば<sup>[argmaxの補足](#補足argmaxの意味)</sup>
 
 $$\begin{align}
 &\arg\max_q \mathcal{J}(q,\pmb\theta)\\
-=&\arg\max_q {E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)}
+=&\arg\max_q {\mathbb E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}-KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right] + \log p(\pmb\theta)}
 \end{align}$$
 
 となります。ここで、このステップでは $\log p(\pmb\theta)$ は定数であり無視できます。また、温度パラメタ $\alpha$ は非負定数なので、
 
-$$\begin{align}
-&\arg\max_q \mathcal{J}(q,\pmb\theta)\\
-=&\arg\max_q {E_{\tau\sim q}\left[\sum_t r_t-\alpha KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right]}
-\end{align}$$
+$$=\arg\max_q {\mathbb E_{\tau\sim q}\left[\sum_t r_t-\alpha KL(q(\cdot|\pmb s_t)||\pi(\cdot|\pmb s_t, \pmb\theta))\right]}$$
 
-さらに、トラジェクトリ期待値 $E_{\tau\sim q}$ を状態行動ステップ期待値 $E_{\mu(s)}$
+さらに、トラジェクトリ期待値 $\mathbb E_{\tau\sim q}$ を状態行動ステップ期待値 $\mathbb E_{\mu(s)}$ に書き直すと
+
+$$\arg\max_q \mathbb E_{\mu(\pmb s)}\left[\mathbb E_{\pmb a\sim q}\right]$$
 
 ## 参考文献
 
-[1] [強化学習 as Inference： Maximum a Posteriori Policy Optimizationの実装](https://horomary.hatenablog.com/entry/2022/07/21/192741)
+[1] [Maximum a Posteriori Policy Optimization](https://openreview.net/forum?id=S1ANxQW0b)
 
-[2] [Maximum a Posteriori Policy Optimization](https://openreview.net/forum?id=S1ANxQW0b)
+[2] [強化学習 as Inference： Maximum a Posteriori Policy Optimizationの実装](https://horomary.hatenablog.com/entry/2022/07/21/192741)
 
 [3] [Trust Region Policy Optimization (2015)](https://arxiv.org/abs/1502.05477)
 
 [4] [Control as Inference, mendy, Speaker Deck](https://speakerdeck.com/shunichi09/sergey-levine-lecture-remake-14th-control-as-inference?slide=5)
+
+[5] [（9） マルコフ過程（状態遷移行列・極限分布）](http://sysplan.nams.kyushu-u.ac.jp/gen/edu/SystemsDesignEngineering/2019/09.pdf)
 
 ## Appendix
 
@@ -155,7 +164,7 @@ $$\begin{align}
 
 *objective*とは強化学習の**目的関数**のことであり、エージェントが最大化しようとする長期的な報酬の期待値です。一般に、以下のような式で表されます。
  
-$$J(\pi) = E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
+$$J(\pi) = \mathbb E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 
 ここで、 $\pi$ はエージェントのポリシー、 $\gamma$ は割引率、 $r(s_t,a_t)$ は状態 $s_t$ で 行動 $a_t$ を取った時にエージェントが得られる報酬です。
 
@@ -280,6 +289,8 @@ $$L(x,\pmb\lambda,\pmb\mu)=f(x)+\sum_{i=1}^m\lambda_ig_i(x)+\sum_{j=1}^p\mu_jh_j
 - $\arg\max_q \mathcal J(q,\pmb\theta)$
 
 関数 $\mathcal J(q,\pmb\theta)$ を最大化する $q$ の値を意味します。言い換えれば、これは $\mathcal J$ が目的関数、 $q$ がモデルパラメータである最適化問題の最適解です。
+
+$\argmax$ 自体は特定の関数や手法を示すものではなく、実際に $\mathcal J(q,\pmb\theta)$ の最適化（最大化）問題を解く際に具体的な手法を指定します（今回はKKT条件有のラグランジュの未定乗数法）。
 
 #### 補足：イェンセンの不等式を利用した式変形
 
