@@ -91,7 +91,7 @@ $$b(s)=P(s|h)$$
 POMDPとして $P\triangleq \{\mathcal{S,A},p_{s_0},p_T,g,\mathcal{O},p_o\}$ の7つ組で定義される離散時間の確率過程を考えます。ここで $\{\mathcal{S,A},p_{s_0},p_T,g\}$ はMDPで用いられるものと同じであり、ほかは次の通りです。
 
 - 有限観測集合 $\mathcal O\triangleq\{o^1,...,o^{|\mathcal O|}\}\ni o$
-- 観測確率関数 $p_o$ : $\mathcal{O\times A\times S}\to [0,1]$ : $p_o(o|\grave{a},s)\triangleq Pr(O_t = o|A_{t-1}=\grave{a},S_t=s), \forall t\in \mathbb{N}$
+- 観測確率関数 $p_o$ : $\mathcal{O\times A\times S}\to [0,1]$ : $p_o(o|\grave{a},s)\triangleq \mathrm{Pr}(O_t = o|A_{t-1}=\grave{a},S_t=s), \forall t\in \mathbb{N}$
 
 もっとも重要な点として、エージェントは観測（または観測信号）とよばれる値 $o\in \mathcal O$ を環境から観測します。
 
@@ -107,7 +107,7 @@ $$\breve{h_t}\triangleq\{a_0,r_0,o_1,...,a_{t-1},r_{t-1},o_t\} \tag1$$
 
 POMDPのグラフィカルモデルから、 $S_t$ が与えられると $\breve{H_t}$ と $\breve{H}_{t+1}$ \ $\breve{H}_t\space (\triangleq\{A_t,R_t,O_{t+1}\})$ が独立であることがわかります。つまり、
 
-$$Pr(\breve{H}_t,A_t,R_t,O_{t+1}|S_t,P)=Pr(\breve{H}_t|s_t,P)Pr(A_t,R_t,O_{t+1}|S_t,P)\tag2$$
+$$\mathrm{Pr}(\breve{H}_t,A_t,R_t,O_{t+1}|S_t,P)=\mathrm{Pr}(\breve{H}_t|s_t,P)\mathrm{Pr}(A_t,R_t,O_{t+1}|S_t,P)\tag2$$
 
 が成り立ちます。式 $(2)$ のような条件付独立を、Dawid(1979)[41] の記法を用いて
 
@@ -124,9 +124,9 @@ POMDPの解法では、このような確率変数の独立性を利用します
 
 POMDPを考えるために**信念状態**を導入し、信念状態に基づく方策の性質を説明します。信念状態とはこれまでの履歴から今現在いずれの隠れ状態 $s\in\mathcal S$ にあるかを表す変数で、環境からの観測があるたびに更新されます。具体的には、ある時間ステップ $t\in\mathbb{N}_0$ の信念状態 $b_t$ は履歴 $\breve{h}_t$ が与えられたときの状態 $S_t$ の条件付確率関数 $b_t\colon \mathcal{S\times \breve{H}_t}\to [0,1]$ として定義されます。
 
-$$b_t(s;\breve{h}_t)\triangleq Pr(S_t=s|\breve{H}_t=\breve{h}_t,P),\space \forall s\in \mathcal S\tag5$$
+$$b_t(s;\breve{h}_t)\triangleq \mathrm{Pr}(S_t=s|\breve{H}_t=\breve{h}_t,P),\space \forall s\in \mathcal S\tag5$$
 
-以降、簡便化のため、履歴 $\breve{h}_t$ の区別が必要でない限り、 $$b_t(s;\breve{h}_t)$ の $\breve{h}_t$ を省略して $b_t(s)$ と表記することにします。信念状態の集合を
+以降、簡便化のため、履歴 $\breve{h}_t$ の区別が必要でない限り、 $b_t(s;\breve{h}_t)$ の $\breve{h}_t$ を省略して $b_t(s)$ と表記することにします。信念状態の集合を
 
 $$\mathcal{B}\triangleq\left\{b\colon\mathcal{S}\to[0,1]\colon\sum_{s\in\mathcal{S}}{b(s)}=1\right\} \tag6$$
 
@@ -135,10 +135,10 @@ $$\mathcal{B}\triangleq\left\{b\colon\mathcal{S}\to[0,1]\colon\sum_{s\in\mathcal
 信念状態の計算方法ですが、その定義から、 $b_{t+1}$ を単純に計算しようとすると、履歴全体 $\breve{h}_{t+1}=\{a_0,r_0,o_1,...,a_{t-1},r_{t-1},o_t\}$ から求める必要があり、大変です。しかし、信念状態の重要な特徴として、次式のように $\{b_t,a_t,r_t,o_{t+1}\}$ が $b_{t+1}$ に対する十分統計量となり、 $\breve{h}_t$ の代わりに $b_t$ を用いても $b_{t+1}$ が求められること、つまり系列 $B_0,B_1,...$ をマルコフ過程とみなすことができます。任意の $s^\prime\in\mathcal S$ について、
 
 $$\begin{align}
-b_{t+1}(s^\prime)&=Pr(S_{t+1}=s^\prime|\breve{h}_{t+1})\\
-&=Pr(S_{t+1}=s^\prime|\breve{h}_t,a_t,r_t,o_{t+1})\\
-&=\frac{Pr(r_t,S_{t+1}=s^\prime ,o_{t+1}|\breve{h}_t,a_t)}{\sum_{s^\prime\in\mathcal{S}}{Pr(r_t,S_{t+1}=s^\prime ,o_{t+1}|\breve{h}_t,a_t)}} \space (\because Bayes' theorem)\\
-&=\frac{\sum_{s\in\mathcal{S}}{Pr(r_t,S_{t+1}=s^\prime ,o_{t+1}|S_t=s,a_t)Pr(S_t=s|\breve{h}_t)}}{\sum_{s^\prime\in\mathcal{S}}{\sum_{s\in\mathcal{S}}{Pr(r_t,S_{t+1}=s^\prime ,o_{t+1}|S_t=s,a_t)Pr(S_t=s|\breve{h}_t)}}} \space(\because Equ.(3))\\
+b_{t+1}(s^\prime)&=\mathrm{Pr}(S_{t+1}=s^\prime|\breve{h}_{t+1})\\
+&=\mathrm{Pr}(S_{t+1}=s^\prime|\breve{h}_t,a_t,r_t,o_{t+1})\\
+&=\frac{\mathrm{Pr}(r_t,S_{t+1}=s^\prime ,o_{t+1}|\breve{h}_t,a_t)}{\sum_{s^\prime\in\mathcal{S}}{\mathrm{Pr}(r_t,S_{t+1}=s^\prime ,o_{t+1}|\breve{h}_t,a_t)}} \space (\because Bayes' theorem)\\
+&=\frac{\sum_{s\in\mathcal{S}}{\mathrm{Pr}(r_t,S_{t+1}=s^\prime ,o_{t+1}|S_t=s,a_t)\mathrm{Pr}(S_t=s|\breve{h}_t)}}{\sum_{s^\prime\in\mathcal{S}}{\sum_{s\in\mathcal{S}}{\mathrm{Pr}(r_t,S_{t+1}=s^\prime ,o_{t+1}|S_t=s,a_t)\mathrm{Pr}(S_t=s|\breve{h}_t)}}} \space(\because Equ.(3))\\
 &=\frac{p_o(o_{t+1}|a_t,s^\prime)\sum_{s\in\mathcal{S}}{p_T(s^\prime|s,a_t)\mathbb{I}_{\{g(s,a_t)=r_t\}}b_t(s)}}{\sum_{s^\prime\in\mathcal{S}}{p_o(o_{t+1}|a_t,s^\prime)\sum_{s\in\mathcal{S}}{p_T(s^\prime|s,a_t)\mathbb{I}_{\{g(s,a_t)=r_t\}}b_t(s)}}} \space(\because Equ.(4)) \tag7
 \end{align}$$
 
@@ -176,7 +176,7 @@ $$b_{t+1}=\Psi(b_t,a_t,r_t,o_{t+1})\tag9$$
 
 つまり、式(1) の履歴 $\breve{h}_t$ から報酬を省略した履歴 $\breve{h_t}\triangleq\{a_0,r_0,...,a_{t-1},r_{t-1},o_t\}$ を用いて信念状態を
 
-$$\bar{b}_t(s)\triangleq Pr(S_t=s|\bar{H}_t=\bar{h}_t)$$
+$$\bar{b}_t(s)\triangleq \mathrm{Pr}(S_t=s|\bar{H}_t=\bar{h}_t)$$
 
 と定義します。このときの信念状態 $\bar{b}$ の更新則は
 
@@ -202,13 +202,13 @@ $$\left .\begin{array}{r}
 
 任意のPOMDP $\mathrm P$ と、履歴依存の方策系列 $\pmb{\breve\pi}^h=\{\breve\pi_0^h\in\breve\Pi_0^h, \breve\pi_1^h\in\breve\Pi_1^h,...\}$ に対して、次を満たすような信念状態の確率的方策の系列 $\pmb{\breve{\pi}}^m\triangleq\{\breve\pi_0\in\breve\Pi, \breve\pi_1\in\breve\Pi,...\}\in\pmb{\breve\Pi}^M$ が存在する。
 
-$$Pr(S_t=s,A_t=a|P(\pmb{\breve\pi}^h))=Pr(S_t=s,A_t=a|P(\pmb{\breve\pi}^m)),\space \forall (t,s,a)\in\mathbb{N}_0\times\mathcal{S\times A} \tag{11}$$
+$$\mathrm{Pr}(S_t=s,A_t=a|P(\pmb{\breve\pi}^h))=\mathrm{Pr}(S_t=s,A_t=a|P(\pmb{\breve\pi}^m)),\space \forall (t,s,a)\in\mathbb{N}_0\times\mathcal{S\times A} \tag{11}$$
 
 #### 続き
 
 以降、方策の集合をひとまとめにして $\pmb{\breve\Pi}\triangleq(\pmb{\breve\Pi}^H\cup\pmb{\breve\Pi}^M)$ と定義します。なお、遷移可能な信念状態はつねに対応する履歴を１つ以上もつので、実質 $\pmb{\breve\Pi}^H\supseteq\pmb{\breve\Pi}^M$ です。よって $(11)$ から、MDPの場合と同様に目的関数 $f\colon\pmb{\breve\Pi}\to\mathbb{R}$ を
 
-$$f(\pmb{\breve\pi})=f^\prime(Pr(S_0,A_0|P(\pmb{\breve\pi})),Pr(S_1,A_1|P(\pmb{\breve\pi})),...),\space\forall \pmb{\breve\pi}\in\pmb{\breve\Pi} \tag{12}$$
+$$f(\pmb{\breve\pi})=f^\prime(\mathrm{Pr}(S_0,A_0|P(\pmb{\breve\pi})),\mathrm{Pr}(S_1,A_1|P(\pmb{\breve\pi})),...),\space\forall \pmb{\breve\pi}\in\pmb{\breve\Pi} \tag{12}$$
 
 のように表現できるのならば、
 
@@ -224,7 +224,7 @@ $$f_p(\pmb{\breve\pi})\triangleq\mathbb{E}\left[\sum_{t=0}^\infty{\gamma^tR_t|P(
 
 $$\left.\begin{array}{r}
 f_p(\pmb{\breve\pi})=&\displaystyle\sum_{t=0}^\infty\gamma^t\mathbb{E}[g(S_t,A_t)|P(\pmb{\breve\pi})]\\
-=&\displaystyle\sum_{t=0}^\infty\sum_{s_t\in\mathcal{S}}\sum_{a_t\in\mathcal{A}}{Pr(S_t,A_t|P(\pmb{\breve\pi}))g(S_t,A_t)}
+=&\displaystyle\sum_{t=0}^\infty\sum_{s_t\in\mathcal{S}}\sum_{a_t\in\mathcal{A}}{\mathrm{Pr}(S_t,A_t|P(\pmb{\breve\pi}))g(S_t,A_t)}
 \end{array}\right.$$
 
 のように書き直せ、式 $(12)$ のような構造をもつので、
@@ -291,6 +291,8 @@ POMDPの環境モデルPが基地であるとして、プランニング（最�
 
 
 > Pが未知の場合はPOMCPとか？(7.3節)
+
+> > 式2と式3違くない？
 
 ### 参考文献
 
