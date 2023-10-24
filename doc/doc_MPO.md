@@ -91,17 +91,41 @@ $$\begin{align}
 
 $$\begin{align}
 &\int{q(\tau)\log{p(\mathcal O=1|\tau)}d\tau}+\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau} \tag{4}\\
-&=\mathbb E_{\tau\sim q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
-&=\mathbb E_{\tau\sim q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
+&=\mathbb E_{q} \left[\log{\exp {\sum_t \frac{r_t}{\alpha}}} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau\\
+&=\mathbb E_{q} \left[\sum_t \frac{r_t}{\alpha} \right] + \int {q(\tau) \log {\frac{p_\pi(\tau)}{q(\tau)}}}d\tau
 \end{align}$$
 
 と変形できます。ここで $\alpha$ は温度パラメータであり、報酬 $r_t$ をスケーリングする役割を持ちます。このとき $p, q$ はいずれも方策分布を表します。上式から、報酬和が高いほど最適トラジェクトリである確率が指数的に高まることがわかります。上式の第二項はKLダイバージェンス<sup>[補足](#補足klダイバージェンス)</sup> $KL(q(\tau)||p_\pi(\tau|\pmb\theta))$ と同様の形式( $-KL(\cdot)$ )ですから、
 
-$$\log{p_\pi(\mathcal O=1)}=\mathbb E_{\tau\sim q}\left[\sum_t \frac{r_t}{\alpha}\right]-KL(q(\tau)||p_\pi(\tau|\pmb\theta))$$
+$$\begin{align}
+\log{p_\pi(\mathcal O=1)}&=\mathbb E_{q}\left[\sum_t \frac{r_t}{\alpha}\right]-\mathrm{KL}(q(\tau)||p_\pi(\tau|\pmb\theta))\\
+&=\mathcal J(q,\pi)\end{align}$$
 
-とできます[1, Equ.2]。尤度関数を介して確率モデルを構築することにより、推論問題として扱うことができるようになりました。ここで、直感的には、 $\mathcal O$ **は、アクションを選択することにより最大の報酬を獲得するイベント**として解釈できます。
+とできます（ $\mathcal J$ は目的関数）[1, Equ.2]。尤度関数を介して確率モデルを構築することにより、推論問題として扱うことができるようになりました。ここで、直感的には、 $\mathcal O$ **は、アクションを選択することにより最大の報酬を獲得するイベント**として解釈できます。
 
-トラジェクトリ $\tau$ は扱いが困難です。ここでトラジェクトリのKLダイバージェンスは各行動ステップのダイバージェンスに分解できると**想定すれば**（若干ここに無理があるようですが）、上式は
+次に、 $p_\pi$ と[同じ方法で因数分解](#環境設定)する変分分布 $q(\tau)=p(s_0)\prod_{t>0}p(s_{t+1}|s_t,a_t)q(a_t|s_t)$ を仮定し変形すると[1, Equ.3]、
+
+$$\mathcal J(q,\pi)=\mathbb E_q\left[\sum_{t=0}^\infty\gamma^t\big[r_t-\alpha\mathrm{KL}\left(q(a|s_t)||\pi(a|s_t,\pmb\theta)\right)\big]\right]+\log p(\pmb\theta)$$
+
+ここで、第一項は、割引報酬の期待合計を最大化しながら、KLダイバージェンスに関して $q(a|s_t)$ と $\pi(a|s_t,\pmb\theta)$ が近づくように操作することを示します（KLダイバージェンスは2分布が近しいほど0に近づくため）。 $\log p(\pmb\theta)$ 項はポリシーパラメタに対する事前変数であり、最大事後推定問題によって動機付けられます。
+
+>$$\mathcal J(q,\pi)=\mathbb E_{q}\left[\sum_t \frac{r_t}{\alpha}\right]-\mathrm{KL}(q(\tau)||p_\pi(\tau|\pmb\theta))$$
+>
+> 温度パラメタ $\alpha>0$ を掛けても $\arg\max_q \mathcal J$ の結果は変わらないため、これを掛けた関数を新たな $\mathcal J(q,\pi)$ とします。
+> 
+> 期待報酬は $\mathbb E_{q}\left[\sum_{t=0}^\infty\gamma^tr_t\right]$ であるので、
+>
+> $$\begin{align}\mathcal J(q,\pi)=\frac{1}{\alpha}\mathbb E_{q}\left[\sum_{t=0}^\infty\gamma^tr_t\right]-\mathbb E_q\Big[\log q(\tau)-\log p_\pi(\tau|\pmb\theta)\Big]\end{align}$$
+>
+> と変形できます。また、 $p(\tau), q(\tau|\pmb\theta)$ の定義から、 $\log p_\pi(\tau|\pmb\theta)=\log p(s_0)+\sum_{t=0}^\infty \big(\log p(s_{t+1}|s_t)+\log \pi(a_t|s_t,\pmb\theta)\big)$ および $\log q(\tau)=\log p(s_0)+\sum_{t=0}^\infty \big(\log p(s_{t+1}|s_t)+\log q(a_t|s_t)\big)$ がわかります。これを上式に代入すれば
+>
+> $$\mathcal J(q,\pi)=\frac{1}{\alpha}\mathbb E_{q}\left[\sum_{t=0}^\infty\gamma^tr_t\right]-\mathbb E_q\left[\sum_{t=0}^\infty \big(\log q(a_t|s_t)-\log \pi(a_t|s_t,\pmb\theta)\big)\right]$$
+>
+> トラジェクトリ $\tau$ は扱いが困難です。ここでトラジェクトリのKLダイバージェンスは各行動ステップのダイバージェンスに分解できると**想定すれば**（若干ここに無理があるようですが）[2]、上式は
+> 
+> $$\mathcal J(q,\pi)=\frac{1}{\alpha}\mathbb E_q\left[\sum_{t=0}^\infty\gamma^tr_t\right]-\mathbb E_q\left[\sum_{t=0}^\infty\gamma^t \mathrm{KL}\left(q(a|s_t)||\pi(a|s_t,\pmb\theta)\right)\right]$$
+> $$\mathcal J(q,\pi)=\mathbb E_q\left[\sum_{t=0}^\infty\gamma^t\big[r_t-\alpha\mathrm{KL}\left(q(a|s_t)||\pi(a|s_t,\pmb\theta)\right)\big]\right]+\log p(\pmb\theta)$$
+
 
 $$\int{q(\tau)\log \frac{p_\pi(\tau)}{q(\tau)}d\tau}=\mathbb E_{\tau\sim q}\left[-KL(q(\cdot|s_t)||\pi(\cdot|s_t, \pmb\theta))\right] + \log p(\pmb\theta)$$
 
@@ -172,9 +196,9 @@ $$J(\pi) = \mathbb E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 
 #### 補足：KLダイバージェンス
 
-*Kullback-Leivler divergence*（KLダイバージェンス）とは、2つの確率分布がどの程度似ているかを表す尺度です。定義は下記の通りです[A2]。
+*Kullback-Leivler divergence*（KLダイバージェンス）とは、2つの確率分布がどの程度似ているかを表す尺度です。連続確率変数に対する定義は下記の通りです[A2]。
 
-$$KL(p||q)=\int_{-\infty}^\infty {p(x)\log{\dfrac{p(x)}{q(x)}}}dx$$
+$$\begin{align}\mathrm{KL}(p||q)&=\int_{-\infty}^\infty {p(x)\log{\dfrac{p(x)}{q(x)}}}dx\\ \Bigg( &=\mathbb E_q\left[\log\frac{p(x)}{q(x)}\right]\Bigg)\end{align}$$
  
 重要な特性として、**同じ確率分布では0になる**点（ $KL(p||p)=0$ ）、常に0以上の値を取り、**似ていないほど大きな値を取る**点が挙げられます。
 
