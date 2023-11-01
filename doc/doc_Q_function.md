@@ -19,7 +19,7 @@
 
 効用関数 $q$ に何を用いるかは問題設定に依存しますが、通常はリターン $C_0=\sum_{t=0}^\infty{\gamma^t R_t}$ の、状態行動（と方策）の条件付き期待値
 
-$$Q^\pi(s,a)\triangleq\mathbb{E}^\pi[C_0|S_0=s,A_0=a]\tag5$$
+$$Q^\pi(s,a)\triangleq\mathbb{E}^\pi[C_0|S_0=s,A_0=a]\tag1$$
 
 の推定値 $q(s,a)$ として用います。関数 $Q^\pi\colon\mathcal{S\times A}\to\mathbb{R}$ は**行動価値関数**（*action value function*）もしくは**Q関数**とよばれ、状態空間の価値関数 $V^\pi$ を**状態行動空間に拡張した価値関数**といえます。Q関数は期待リターンの不確実性を考慮しないため、これを考慮するためには方策にランダム性を取り入れることになります（ $\varepsilon$ 貪欲方策やソフトマックス方策など）。一方で、不確実度 $u\colon\mathcal{S\times A}\to\mathbb{R}$ により補正した効用関数を用いる方法も存在します（UCB1法など）。
 
@@ -86,6 +86,20 @@ $$Q^\pi(s,a)=\mathbb{E}\left[\sum_{t=0}^\infty{\gamma^tR_t}\Big|S_0=s,A_0=a\righ
 |(V関数, V値)|Q関数, Q値|関数の記号から。Q値は正確にはQ関数の出力値<br>V関数&V値についてはほとんど見たことがない|
 |状態価値関数|状態行動価値関数| $V^\pi$ が状態空間の、 $Q^\pi$ が状態行動空間の関数であることから|
 
+## 補足：Q関数の更新式
+
+当初Q関数について調べていた際、Q関数の式として次のような式が記述されている記事があり、式 $(1)$ の定義との違いに悩まされたことがありました。
+
+$$\begin{aligned}&Q(s_t,a_t)\leftarrow Q(s_t,a_t)+\alpha_t\delta_t\\
+
+&s.t.\space\delta_t\coloneqq \left\{\begin{aligned}
+r_t+\gamma\max_{a'\in\mathcal{A}}{Q(s_{t+1},a')}-Q(s_t,a_t)\space&\big(\textit{Q-learning}\big)\\
+r_t+\gamma\max_{a'\in\mathcal{A}}{Q(s_{t+1},a')}-Q(s_t,a_t)\space&\big(SARSA\big)
+\end{aligned}\right.\end{aligned}\tag{S.1}$$
+
+ここで、上式の $\delta$ はTD誤差、 $\alpha_t$ は学習率です[0]。節タイトルからわかるように、実際には上式はQ関数の更新式であり、オンライン学習の一種である**Q-learning**法や**SARSA**法で使用されます。Q-learning法はオフポリシー型の手法であり、SARSA法はオンポリシー型の手法です。
+
+以上から、Q関数の定義は式 $(1)$ であり、式 $(S.1)$ はQ関数の更新式であるという違いを理解することができました。
 
 ## 参考文献
 
