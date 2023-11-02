@@ -14,7 +14,8 @@
     - [マルコフ決定過程（ok）](#マルコフ決定過程ok)
     - [目的関数（ok）](#目的関数ok)
   - [方策](#方策)
-    - [方策の分類](#方策の分類)
+    - [方策の分類 (not ok)](#方策の分類-not-ok)
+    - [逐次意思決定問題の定式化](#逐次意思決定問題の定式化)
 - [参考文献](#参考文献)
 
 
@@ -111,13 +112,69 @@ $$\mathbb{E}\left[\lim_{T\to\infty}{\sum_{t=0}^T\gamma^tR_t}|M(\pi)\right]$$
 
 > 一般的に機械学習の分野では、上記のような行動や選択を行う学習者のことを**エージェント**（*agent*）と呼びます。また、学習で扱う系全体のことは**環境**（*environment*）と呼びます。例として、家でハイハイを学習する赤ちゃんをこれに見立てれば、赤ちゃんはエージェントであり、その環境は家といえます。
 
-### 方策の分類
+### 方策の分類 (not ok)
 
 式 $(2)$ で定義した確率的方策 $\pi$ の集合 $\Pi$ の部分集合として、**決定的方策**（*deterministic policy*） $\pi^d$ の集合 $\Pi^d$ を定義できます。
 
 $$\Pi^d\triangleq\{\pi^d\colon\mathcal{S\to A}\}\tag5$$
 
+また、
 
+$$\pi(a|s)\coloneqq\left\{\begin{aligned}
+&1\space&(a=\pi^d(s))\\
+&0\space&(それ以外)
+\end{aligned}\right.,\space\forall (s,a)\in\mathcal{S\times A}$$
+
+のように $\pi^d$ を確率的方策 $\pi$ の形式に書き直すことができ、 $\Pi^d\subset\Pi$ がわかります。
+
+上に定義した $\pi$ や $\pi^d$ は状態 $s$ にのみ依存し、過去の経験には独立であることから**マルコフ方策**（*Markov policy*）といいます。さらに、時間ステップ $t$ にも依存しないことから**定常なマルコフ方策**（*stationary Markov policy*）とも呼ばれます。一方、非定常な方策系列
+
+$$\pmb{\pi}^m\triangleq\{\pi_0\in\Pi,\pi_1\in\Pi,...\}\in\Pi^M\tag6$$
+
+や、時間不定の定常な方策の系列（式 $(2),(5)$ ）
+
+$$\begin{align}
+\pmb{\pi}^s&\triangleq\{\pi,\pi,...\}\in\Pi^S,&\pi\in\Pi\tag{7}\\
+\pmb{\pi}^sd&\triangleq\{\pi^d,\pi^d,...\}\in\Pi^{SD},&\pi^d\in\Pi^d\tag{8}\\
+\end{align}$$
+
+を定義できます。
+
+一方、現在の状態に加えてそれ以前の経験にも依存する非マルコフ方策も考えることができます。MDPにおいて、現在の時間ステップ $t$ までのすべての経験の履歴は
+
+$$\{s_0,a_0,r_0,...,s_{t-1},a_{t-1},r_{t-1},s_t\}\triangleq h_t\in\mathcal{H}_t\tag{9}$$
+
+で定義されます。これに基づき行動選択確率を決めるような履歴依存の方策
+
+$$\begin{aligned}&\pi_t^h\colon\mathcal{A}\times\mathcal{H}_t\to[0,1],\\
+&\pi_t^h(a|h_t)\triangleq\mathrm{Pr}(A=a,|H_t=h_t)\end{aligned}\tag{10}$$
+
+も定義できます。任意の $\pi_t^h$ を含む方策集合を
+
+$$\Pi_t^h\triangleq\left\{\pi_t^h\colon\mathcal{A}\times\mathcal{H}_t\to[0,1]\colon\sum_{a\in\mathcal{A}}{\pi_t^h(a|h_t)=1}\right\}\tag{11}$$
+
+と表記し、その系列を
+
+$$\pmb{\pi}^h\triangleq\{\pi_0^h,\pi_1^h,...\}\in\pmb{\Pi}^H\triangleq(\Pi_t^h)_{t\in\mathbb{N}_0}\tag{12}$$
+
+とします。以上の系列は、下記のような包含関係を持ちます。
+
+```mermaid
+graph TD;
+  subgraph A["履歴依存の方策系列の集合"]
+    B
+  end
+  subgraph B["(非定常な)マルコフ方策系列の集合"]
+    C
+  end
+  subgraph C["定常なマルコフ方策系列の集合"]
+    D
+  end
+  subgraph D[定常な決定的マルコフ方策系列の集合]
+  end
+```
+
+### 逐次意思決定問題の定式化
 
 # 参考文献
 
