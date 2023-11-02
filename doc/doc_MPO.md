@@ -16,6 +16,7 @@
   - [参考文献](#参考文献)
   - [Appendix](#appendix)
     - [用語の解説](#用語の解説)
+      - [補足：maximum a posteriori（MAP; 最大事後確率）](#補足maximum-a-posteriorimap-最大事後確率)
       - [補足：objective (目的関数)](#補足objective-目的関数)
       - [補足：KLダイバージェンス](#補足klダイバージェンス)
       - [補足：期待値](#補足期待値)
@@ -183,6 +184,14 @@ $$\arg\max_q \mathbb E_{\mu(\pmb s)}\left[\mathbb E_{\pmb a\sim q}\right]$$
 ## Appendix
 
 ### 用語の解説
+
+#### 補足：maximum a posteriori（MAP; 最大事後確率）
+
+**maximum a posteriori**（MAP; 最大事後確率）という語は、一般に最大事後確率推定（MAP推定）というベイズ統計学の手法名において出てくる語です。
+
+> 最大事後確率推定[A16]
+>
+> 実測データに基づいて未知の量の点推定を行う手法である。ロナルド・フィッシャーの最尤推定 (MLE) に密接に関連するが、推定したい量の事前分布を利用して最適化問題を解き確率が最大の結果を得る。したがってMAP推定は、最尤推定に正則化をつけた物と見ることもできる。
 
 #### 補足：objective (目的関数)
 
@@ -367,3 +376,5 @@ $$\log{\int {\frac{p_\pi(\tau)p(\mathcal O=1|\tau)}{q(\tau)}q(\tau)d\tau}}\geq \
 [A14] [Lagrange Multiplier Approach with Inequality Constraints](https://machinelearningmastery.com/lagrange-multiplier-approach-with-inequality-constraints/)
 
 [A15] [Questions about constraints and KKT conditions](https://math.stackexchange.com/questions/84252/questions-about-constraints-and-kkt-conditions)
+
+[A16] [最大事後確率](https://ja.wikipedia.org/wiki/%E6%9C%80%E5%A4%A7%E4%BA%8B%E5%BE%8C%E7%A2%BA%E7%8E%87#:~:text=%E6%9C%80%E5%A4%A7%E4%BA%8B%E5%BE%8C%E7%A2%BA%E7%8E%87%EF%BC%88%E3%81%95%E3%81%84%E3%81%A0,%E6%9C%80%E5%A4%A7%E3%81%AE%E7%B5%90%E6%9E%9C%E3%82%92%E5%BE%97%E3%82%8B%E3%80%82)
