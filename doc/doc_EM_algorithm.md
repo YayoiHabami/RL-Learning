@@ -172,7 +172,7 @@ $$Q(\theta|\theta')=\mathbb{E}\left[\ell_c(\theta')|y,\theta\right]=\int_{\Omega
 
 $$f(z|y,\theta)=\frac{f(x|\theta)}{f(y|\theta)}=\frac{f(y,z|\theta)}{f(y|\theta)}$$
 
-> Q-learning法のQ関数とは異なります。どちらも最適化問題に係るものなのですこしややこいです。
+> Q-learning法のQ関数とは異なります。どちらも最適化問題に係るものなのですこしややこいです。このQ関数は $x$ に対する最大尤度関数の条件付き期待値ですが、Q-learning法のQ関数は（方策と報酬関数の下での）状態と行動の関数であり、将来の割引報酬額を予想する関数です。
 
 ### E-step & M-Step
 
