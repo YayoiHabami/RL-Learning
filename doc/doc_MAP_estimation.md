@@ -2,6 +2,8 @@
 
 とくにベイズの定理をこんなに長々と説明する必要あるか？
 
+あとベイズの定理の部分とMAP推定の部分で確率変数（と実現値？）の記法にゆれがあるからどちらかに統一したい。
+
 # MAP推定
 
 MAP推定（Maximum a Posteriori estimation; 最大事後確率推定）をEMアルゴリズムにより行うことが可能です。
@@ -34,28 +36,62 @@ $$P(Y)=\sum_{i=1}^n{P(Y|X=x_i)P(X=x_i)}$$
 
 ### 連続型確率分布への拡張
 
-上に述べたベイズの定理では離散値の事象を対象として考えましたが、後のためには連続型の確率分布を考える必要があります。結果 $y$ のための統計モデルを考え、そのパラメタを $\theta$ とします。確率密度関数 $f$ を用いて、ベイズの定理は
+上に述べたベイズの定理では離散値の事象を対象として考えましたが、後のためには連続型の確率分布を考える必要があります。結果 $y$ のための統計モデルを考え、そのパラメタを $\theta$ とします。このとき、上に述べた4つの確率は次のように言い換えることができます。
 
-$$f(\theta|y)=\frac{f(y|\theta)f(\theta)}{f(y)}=\frac{\mathcal{L}(\theta;y)f(\theta)}{f(y)}$$
+- 事前確率 $f(\theta)$ 　: 標本 $y$ を得る前のパラメタ $\theta$ の確率分布
+- 事後確率 $f(\theta|y)$  : 標本 $y$ を得たあとのパラメタ $\theta$ の確率分布
+- 尤度 $f(y|\theta)$ 　　: パラメタ $\theta$ を定めたもとで標本 $y$ が得られる確率
+- 周辺尤度 $f(y)$ 　: 標本 $y$ が得られる確率
+
+確率密度関数 $f$ を用いて、ベイズの定理は
+
+$$f(\theta|y)=\frac{f(y|\theta)f(\theta)}{f(y)}\left(=\frac{\mathcal{L}(\theta;y)f(\theta)}{f(y)}\right)$$
 
 と書けます。ここで $f(y|\theta)$ は尤度ですので、 $\mathcal{L}(\theta;y)$ とも置き換え可能です。また、このとき周辺尤度 $f(y)$ は次のように計算されます。
 
 $$f(y)=\int_{-\infty}^\infty{f(y|\theta)f(\theta)d\theta}$$
 
+このように周辺尤度 $f(y)$ はその計算が大変なので、ベイズの定理を次のようにして用いることも多いです。
 
+$$f(\theta|y)\propto f(y|\theta)f(\theta)$$
 
-##
+## MAP推定
+
+### ベイズ推論
 
 最尤推定ではパラメタ $\theta$ を決定論的な変数として扱いました。これを確率変数として扱いたい場合もあると思います。この場合に用いられるのが**ベイズ推論**（*Bayesian inference*）です。
 
-パラメタ $\theta$ を確率変数として扱うことにしたので、以下ではその分布を考えることになります。標本
+パラメタ $\theta$ を確率変数として扱うことにしたので、以下ではその分布を考えることになります。標本 $\pmb{X}=X_1,...,X_n$ が与えられたとき、事前確率 $p(\theta)$ 、尤度 $p(\pmb{X}|\pmb{\theta})$ 、事後確率 $p(\theta|\pmb{X})$ などが定義できます。
 
-## 最大事後確率（MAP）
+パラメトリックモデルでは確率変数 $X$ とパラメタ $\theta$ を区別し $g(X;\theta)$ と記述しました。ベイズ推論ではいずれも確率変数ですので、モデルを条件付き確率とみなして $g(X|\theta)$ と表記します。ベイズ推論では、事後確率 $p(\theta|\pmb{X})$ に関してパラメトリックモデル $g(X|\theta)$ を平均化した分布である**事後確率分布**（*posterior predictive distribution*）を利用します。
 
-> *maximum a posteriori*とは
+$$\hat{f}(X)=\int{g(X|\theta)p(\theta|\pmb{X})}$$
+
+事後確率分布 $\hat{f}(X)$ は、標本 $\pmb{X}$ の背後にある確率質量関数/確率密度関数 $f(X)$ の推定値です。また、ベイズの定理と尤度の定義（ $p(\pmb{X}|\theta)=\prod_{i=1}^n{g(X_i|\theta)}$ ）を用いれば、事後確率分布 $\hat{f}(X)$ は次のように求まります。
+
+$$\hat{f}(X)=\frac{\int{g(X|\theta)\prod_{i=1}^n{g(X_i|\theta)}p(\theta)d\theta}}{\int{\prod_{i=1}^n{g(X_i|\theta)}p(\theta')d\theta'}}\tag{12}$$
+
+すなわち、ベイズ推論の枠組みにおいては事前確率 $p(\theta)$ とパラメトリックモデル $g(X|\theta)$ さえ定めれば確率分布を推定することができます（特別な推定や最適化が不必要）。
+
+### MAP推定
+
+パラメタ $\theta$ の次元数が高い場合、式 $(12)$ に含まれる $\theta,\theta'$ の積分を行うのは大変です。ここで、パラメトリックモデル $g(X|\theta)$ の平均化ではなく、事後確率 $p(\theta|\pmb{X})$ を最大にする値（**最頻値**）のみを用いて近似することを考えます。最頻値を $\hat\theta_{MAP}$ とするとき、推定値は
+
+$$\hat{f}(X)=g(X; \hat\theta_{MAP})$$
+
+と書けます。この式により推定を行う手法を**最大事後確率推定**（*maximum a posteriori estimation*; MAP推定）といいます[2]。ここで、最頻値 $\hat\theta_{MAP}$ は
+
+$$\begin{aligned}\hat\theta_{MAP}=&\argmax_\theta{p(\theta|\pmb{X})}\\
+=&\argmax_\theta{[\log{p(\pmb{X}|\theta)+\log{p(\theta)}}]}\end{aligned}$$
+
+と書けます。最尤推定法では第一項の対数尤度 $\log{p(\pmb{X}|\theta)}$ のみを最大化しました。MAP推定ではこれに加えて対数事前確率 $p(\theta)$ も最大化しますが、これにより最尤推定解が事前確率の大きいほうに補正されます。
+
+
+
+> *maximum a posteriori* の意味
 >
-> *a posteriori*は「より後のものから」を意味するラテン語です。条件付き確率の一種である事後確率はその英名を*posterior probability*ということから、*maximum a posteriori*は単純に最大の事後確率であることがわかります。
-
+> *a posteriori* は「より後のものから」を意味するラテン語です。条件付き確率の一種である事後確率はその英名を *posterior probability* ということから、 *maximum a posteriori* は単純に最大の事後確率であることがわかります。
+ 
 ## 参考文献
 
 [1] 入門統計学 第2版, 栗原伸一, オーム社, 第1刷
