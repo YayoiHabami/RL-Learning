@@ -18,7 +18,7 @@
 
 ## 点推定
 
-母集団のパラメータの値を、観測された標本に基づき推測することを**点推定**（*point estimation*）といいます。 $\theta$ をパラメタに持つ確率分布 $P_\theta$ から、ランダムな標本 $X_1,...,x_n,\space iid\sim P_\theta$ を得たとします。 $\theta$ を標本 $(X_1,...,X_n)$ の関数で推定することになるので、 $\theta$ の**推定量**（*estimator*）として関数 $\hat\theta(X_1,...,X_n)$ または $\hat\theta$ を考えます。また、実現値を代入した $\hat\theta(x_1,...,x_n)$ は**推定値**と呼ばれます。
+母集団のパラメータの値を、観測された標本に基づき推測することを**点推定**（*point estimation*）といいます。 $\theta$ をパラメタに持つ確率分布 $P_\theta$ から、ランダムな標本 $X_1,...,X_n,\space iid\sim P_\theta$ を得たとします。 $\theta$ を標本 $(X_1,...,X_n)$ の関数で推定することになるので、 $\theta$ の**推定量**（*estimator*）として関数 $\hat\theta(X_1,...,X_n)$ または $\hat\theta$ を考えます。また、実現値を代入した $\hat\theta(x_1,...,x_n)$ は**推定値**と呼ばれます。
 
 > $iid$（*ndependently and identically distributed*） : 確率変数 $X_1,..,X_n$ が互いに独立
 
@@ -65,6 +65,8 @@ $$\mathcal{L}(\theta^*; \pmb{X})=\max_\theta{\mathcal{L}(\theta; \pmb{X})}$$
 $$\ell(\theta;\pmb{x})=\log\mathcal{L}(\theta;\pmb{x})=\sum_{\pmb{x}}\log{f(x;\theta)}$$
 
 を**対数尤度関数**（*log-likelihood function'）として、これを最大化する $\theta$ を求めることが多いです。
+
+> 尤度関数の各要素 $f(x;\theta)$ が1よりも小さい値を取るとき、その積 $\mathcal{L}(\theta;x)$ は計算が困難なほど小さな値を取ることになります。
 
 $\mathcal{L}(\theta; \pmb{X})$ が $\theta$ について微分可能であれば、対数尤度関数の偏微分を $D\ell(\theta; \pmb{X})$ とおくと、最適点では傾きが0となるので（上図参照）
 
