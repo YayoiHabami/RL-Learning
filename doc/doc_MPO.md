@@ -209,7 +209,25 @@ $$J(\pi) = \mathbb E_\pi [\sum_{t=0}^{\infty} \gamma^t r(s_t,a_t)]$$
 
 $$\begin{align}\mathrm{KL}(p||q)&=\int_{-\infty}^\infty {p(x)\log{\dfrac{p(x)}{q(x)}}}dx\\ \Bigg( &=\mathbb E_q\left[\log\frac{p(x)}{q(x)}\right]\Bigg)\end{align}$$
  
-重要な特性として、**同じ確率分布では0になる**点（ $KL(p||p)=0$ ）、常に0以上の値を取り、**似ていないほど大きな値を取る**点が挙げられます。
+重要な特性として、**同じ確率分布では0になる**点（ $KL(p||p)=0$ ）、**似ていないほど大きな値を取る**点が挙げられます。ほかの基本的性質を以下に示します[A19]。
+
+|||
+|-|-|
+|非負性| $0\leq \mathrm{KL}(p\|\|q)\leq \infty$ |
+|非退化性| $\mathrm{KL}(p\|\|q)=0 \iff p=q$ |
+|非対称性| $\mathrm{KL}(p\|\|q)\neq\mathrm{KL}(q\|\|p)$$ |
+
+別名として**KL情報量**やKL距離などを持ちます。KL「距離」とこそ言われますが、距離の公理を満たさないため厳密には距離ではありません。
+
+> 距離の公理： $X$ 上の距離（関数） $d$ は $d\colon X\times X\to\mathbb{R}$ で定義される関数であり、非退化性、対称性、三角不等式、非負性の４条件を満たします[A18]。また、非負性は非負性を除いた３条件から導かれるので（ $d(x,y)+d(y,x)\geq d(x,x)=0$ ）、弱めて３条件を公理とすることもあります[A17]。
+> |||
+> |-|-|
+> |非退化性| $\forall x,y\in X\colon d(x,y)=0\iff x=y$ |
+> |対称性| $\forall x,y\in X\colon d(x,y)=d(y,x)$ |
+> |三角不等式| $\forall x,y,z\in X\colon d(x,y)+d(y,z)\geq d(x,z)$ |
+> |非負性| $\forall x,y \in X\colon d(x,y)\geq 0$ |
+> 
+> KLダイバージェンスはこのうち非退化性（および非負性）しかを満たさないため距離として定義されません。このように非退化性と非負性のみを満たすような量を *divergence* と呼ぶようです[A19]。
 
 #### 補足：期待値
 
@@ -378,3 +396,9 @@ $$\log{\int {\frac{p_\pi(\tau)p(\mathcal O=1|\tau)}{q(\tau)}q(\tau)d\tau}}\geq \
 [A15] [Questions about constraints and KKT conditions](https://math.stackexchange.com/questions/84252/questions-about-constraints-and-kkt-conditions)
 
 [A16] [最大事後確率](https://ja.wikipedia.org/wiki/%E6%9C%80%E5%A4%A7%E4%BA%8B%E5%BE%8C%E7%A2%BA%E7%8E%87#:~:text=%E6%9C%80%E5%A4%A7%E4%BA%8B%E5%BE%8C%E7%A2%BA%E7%8E%87%EF%BC%88%E3%81%95%E3%81%84%E3%81%A0,%E6%9C%80%E5%A4%A7%E3%81%AE%E7%B5%90%E6%9E%9C%E3%82%92%E5%BE%97%E3%82%8B%E3%80%82)
+
+[A17] [距離空間](https://ja.wikipedia.org/wiki/%E8%B7%9D%E9%9B%A2%E7%A9%BA%E9%96%93)
+
+[A18] [Metric space](https://en.wikipedia.org/wiki/Metric_space)
+
+[A19] [Kullback-Leibler Divergenceについてまとめる](https://yul.hatenablog.com/entry/2019/01/07/152738)
