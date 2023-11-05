@@ -200,7 +200,7 @@ $$f(z|y,\theta)=\frac{f(x|\theta)}{f(y|\theta)}=\frac{f(y,z|\theta)}{f(y|\theta)
 
 ### E-step & M-Step
 
-**EMアルゴリズム**はExpectation-step（E-step）とMaximization-step（M-step）の２つから構成されます[2]。 $t$ 回目のステップで得られる推定値を $\theta^{(t)}$ （初期値は $\theta^{(0)}$ ）とすれば、EMアルゴリズムは次のように表せます。
+**EMアルゴリズム**はExpectation-step（E-step）とMaximization-step（M-step）の２つから構成されます[2]。 $t$ 回目のステップで得られる推定値を $\theta^{(t)}$ （初期値は $\theta^{(0)}$ ）とすれば、EMアルゴリズムは次のように表せます[2]。
 
 > **E-step**：Q関数の計算<br>　 $y$ と $\theta^{(t)}$ のもとで $Q(\theta|\theta^{(t)})$ を計算
 >
