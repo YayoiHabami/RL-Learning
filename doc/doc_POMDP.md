@@ -106,7 +106,9 @@ $$\check{h_t}\triangleq\{a_0,r_0,o_1,...,a_{t-1},r_{t-1},o_t\} \tag1$$
 
 ここで、履歴 $\check{h}$ にチェックがついているのは、POMDPの履歴をMDPの履歴と区別するためである。
 
-![MDPとPOMDPのグラフィカルモデル](参考文献1のグラフィカルモデルを参照)
+![MDPとPOMDPのグラフィカルモデル](imgs/MDPとPOMDPのグラフィカルモデル.png)
+
+図１．MDPとPOMDPのグラフィカルモデル[0]
 
 POMDPのグラフィカルモデルから、 $S_t$ が与えられると $\check{H_t}$ と $\check{H}_{t+1}$ \ $\check{H}_t\space (\triangleq\{A_t,R_t,O_{t+1}\})$ が独立であることがわかります。つまり、
 
@@ -439,7 +441,7 @@ $$\hat{b}^{(n)}(s)\coloneqq\frac1{K}\sum_{k=1}^{K}\mathbb{I}_{\{\zeta_k^{(n)}=s\
 
 ### 参考文献
 
-[メイン] 強化学習, 森村哲郎, MLP 機械学習プロフェッショナルシリーズ, 講談社, 第一刷
+[0] [メイン] 強化学習, 森村哲郎, MLP 機械学習プロフェッショナルシリーズ, 講談社, 第一刷
 おもにChapter 7.1
 
 [12] B. Bakker. Reinforcement learning with long short-term memory. In *Advances in Neural Information Processing Systems*, 2002.
