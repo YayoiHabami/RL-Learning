@@ -229,7 +229,7 @@ $$\mathcal{J}(\pmb{\pi})=\mathbb{E}^{\pmb\pi}[C_0]=\mathbb{E}^{\pmb\pi}\left[\su
 >
 > $$V^{\pmb\pi}(s)\triangleq\mathbb{E}^{\pmb{\pi}}[C_0|S_0=s]$$
 
-> 少し細かい話になりますが、式 $(23)$ の目的関数 $\mathcal{J}(\pmb{\pi})$ は、履歴依存の方策系列の集合 $\pmb{\Pi}^\mathrm{H}$ ではなく、より単純な方策集合である時間不変の決定的方策の集合 $\pmb{\Pi}^\mathrm{SD}$ のみを最適化の対象としてもその値が真に最大化できるという特徴があるようです[0]。すなわち、次を満たします。
+> 最適化対象の単純化：少し細かい話になりますが、式 $(23)$ の目的関数 $\mathcal{J}(\pmb{\pi})$ は、履歴依存の方策系列の集合 $\pmb{\Pi}^\mathrm{H}$ ではなく、より単純な方策集合である時間不変の決定的方策の集合 $\pmb{\Pi}^\mathrm{SD}$ のみを最適化の対象としてもその値が真に最大化できるという特徴があるようです[0]。すなわち、次を満たします。
 >
 > $$\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{H}}\mathcal{J}(\pmb{\pi})=\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{SD}}\mathcal{J}(\pmb{\pi})$$
 
