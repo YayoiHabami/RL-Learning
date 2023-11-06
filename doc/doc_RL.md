@@ -151,20 +151,7 @@ $$\pmb{\pi}^h\triangleq\{\pi_0^h,\pi_1^h,...\}\in\pmb{\Pi}^H\triangleq(\Pi_t^h)_
 
 $$\pmb{\Pi}^{SD}\subseteq\pmb{\Pi}^S\subseteq\pmb{\Pi}^M\subseteq\pmb{\Pi}^H$$
 
-```mermaid
-graph TD;
-  subgraph A["履歴依存の方策系列の集合"]
-    B
-  end
-  subgraph B["(非定常な)マルコフ方策系列の集合"]
-    C
-  end
-  subgraph C["定常なマルコフ方策系列の集合"]
-    D
-  end
-  subgraph D[定常な決定的マルコフ方策系列の集合]
-  end
-```
+<img src="imgs/方策集合の種類.png" width=500>
 
 ## 定式化
 
@@ -232,7 +219,7 @@ $$\pmb{\pi}^*\triangleq\argmax_{\pmb{\pi}\in\Pi}{f(\pmb\pi)}$$
 
 $$\mathcal{J}(\pmb{\pi})=\mathbb{E}^{\pmb\pi}[C_0]=\mathbb{E}^{\pmb\pi}\left[\sum_{t=0}^\infty{\gamma^t R_t}\right]\tag{23}$$
 
-が用いられることが多いです。この目的関数は
+が用いられることが多いです。
 
 > **価値関数**（*value function*） $V^{\pmb\pi}\colon\mathcal{S}\to\R$ を導入すると、式 $(23)$ の目的関数は
 >
@@ -241,6 +228,10 @@ $$\mathcal{J}(\pmb{\pi})=\mathbb{E}^{\pmb\pi}[C_0]=\mathbb{E}^{\pmb\pi}\left[\su
 > すなわち初期状態分布 $p_{s_0}$ による価値関数 $V^{\pmb\pi}(s)$ の重み付き和と解釈できます。ここで、価値関数は次で定義される、方策 $\pmb{\pi}$ の下での、初期状態を $s$ とした期待リターンです。
 >
 > $$V^{\pmb\pi}(s)\triangleq\mathbb{E}^{\pmb{\pi}}[C_0|S_0=s]$$
+
+> 少し細かい話になりますが、式 $(23)$ の目的関数 $\mathcal{J}(\pmb{\pi})$ は、履歴依存の方策系列の集合 $\pmb{\Pi}^\mathrm{H}$ ではなく、より単純な方策集合である時間不変の決定的方策の集合 $\pmb{\Pi}^\mathrm{SD}$ のみを最適化の対象としてもその値が真に最大化できるという特徴があるようです[0]。すなわち、次を満たします。
+>
+> $$\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{H}}\mathcal{J}(\pmb{\pi})=\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{SD}}\mathcal{J}(\pmb{\pi})$$
 
 ## 参考文献
 
