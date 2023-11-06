@@ -29,9 +29,9 @@ $$\mathbb{E}\left[\frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}A_{
 
 としています。したがって、代理アドバンテージに対して上の制約式を正則化項として加えた
 
-$$\mathbb{E}\left[\frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}A_{\theta_{old}}(S_t,A_t)\right]-\beta \mathrm{KL}\big[\pi_{\theta_{old}}(\cdot|S_t)|\pi_{\theta_{new}}(\cdot|S_t)\big]\tag{A1}$$
+$$\mathbb{E}\left[\frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}A_{\theta_{old}}(S_t,A_t)\right]-\beta \mathrm{KL}\big[\pi_{\theta_{old}}(\cdot|S_t)|\pi_{\theta_{new}}(\cdot|S_t)\big]\tag1$$
 
-を目的関数とし、ソフト制約付き最適化問題として目的関数 $(A1)$ の最大化問題を解くというのがTRPOの概要です。
+を目的関数とし、ソフト制約付き最適化問題として目的関数 $1$ の最大化問題を解くというのがTRPOの概要です。
 
 ### ひとくちPPO
 
