@@ -13,11 +13,8 @@
     - [離散分布の場合](#離散分布の場合)
     - [連続分布の場合](#連続分布の場合)
     - [参考文献](#参考文献-1)
-  - [ひとくちTRPO](#ひとくちtrpo)
-    - [PPO](#ppo)
-    - [参考文献](#参考文献-2)
   - [価値関数・行動関数の記法](#価値関数行動関数の記法)
-    - [参考文献](#参考文献-3)
+    - [参考文献](#参考文献-2)
 
 
 ## 面白そうな文献
@@ -124,38 +121,6 @@ $$f_X(x)=\int_{-\infty}^\infty f_{X,Y}(x,y)dy$$
 #### 参考文献
 
 [A1] 統計学-Statistics, 久保川達也, 国友直人, 東京大学出版会, 第2刷（第８章）
-
-### ひとくちTRPO
-
-**TRPO**（*Trust Region Policy Optimization*; 信頼領域による方策最適化）従来の方策勾配法によるアルゴリズムの、学習が安定しないという欠点を**信頼領域法**の導入により解決した手法です。この手法のメインアイデアは、学習の安定化のために**確率的方策が更新前後で大幅に変化することを防ぐ**というものであり、次のような制約を与えます。
-
-$$\mathbb{E}\Big[\mathrm{KL}\big[\pi_{\theta_{old}}(\cdot|S_t)|\pi_{\theta_{new}}(\cdot|S_t)\big]\Big]\leq\delta$$
-
-すなわち、更新前後の確率的方策が離れすぎないように、KL情報量が閾値 $\delta$ 以下となるように規制しています。
-
-またTRPOでは通常の方策勾配アルゴリズムと異なり、その目的を**代理アドバンテージ**（*surrogate advantage*）
-
-$$\mathbb{E}\left[\frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}A_{\theta_{old}}(S_t,A_t)\right]$$
-
-としています。したがって、代理アドバンテージに対して上の制約式を正則化項として加えた
-
-$$\mathbb{E}\left[\frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}A_{\theta_{old}}(S_t,A_t)\right]-\beta \mathrm{KL}\big[\pi_{\theta_{old}}(\cdot|S_t)|\pi_{\theta_{new}}(\cdot|S_t)\big]\tag{A1}$$
-
-を目的関数とし、ソフト制約付き最適化問題として目的関数 $(A1)$ の最大化問題を解くというのがTRPOの概要です。
-
-#### PPO
-
-上記TRPOをもとに、その実装を容易にした上で安定性も向上させた手法に**PPO**（*Proximal Policy Optimization* Algorithms, ~~近位方策最適化~~）が存在します。
-
-更新前後の確率的方策の比率を $r_t(\theta)$ とします。
-
-$$r_t(\theta) = \frac{\pi_{\theta_{new}}(a|S_t)}{\pi_{\theta_{old}}(a|S_t)}$$
-
-更新前後で方策が大幅に変化した場合、 $r_t(\theta)$ は $1$ から大きく離れることになります。このため、目的関数 $(A1)$ には $r_t(\theta)$ の値に依存しやすくなるという欠点が存在します。そこでPPOでは $r_t(\theta)$ の値が $(1-\epsilon, 1+\epsilon)$ の範囲に収まるように制限することでその安定性を向上させています。ここで、実装においては $r_t(\theta)$ と $\mathrm{clip}(r_t(\theta),1-\epsilon,1+\epsilon)$ のうち小さいものを目的関数の $r_t(\theta)$ の値に採用します。
-
-#### 参考文献
-
-[A1] 現場で使える！ Python深層学習入門, 伊藤多一ほか, 翔泳社, 第1刷（Chapter 5.5）
 
 ### 価値関数・行動関数の記法
 
