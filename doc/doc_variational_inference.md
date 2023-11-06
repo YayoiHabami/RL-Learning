@@ -84,8 +84,17 @@ $$q(\pmb Z)=\prod_{i=1}^M{q_i(\pmb{Z}_i)}\tag{5}$$
 
 となります。ここでは分布について、これ以上の仮定はしておらず、特に各因子 $q_i(\pmb{Z}_i)$ の関数形については何の制限もしていません[1]。このような仮定は、物理学における平均場近似（*mean field approximation*）に対応します。
 
-この $q(\pmb{Z})$ を式 $(3)$ に代入し、各因子についてELBOの最適化を行うのが以降の流れとなります。
+この $q(\pmb{Z})$ を式 $(3)$ に代入し、各因子についてELBOの最適化を行うのが以降の流れとなります。詳細は省きますが、任意の因子 $q_j(\pmb{Z}_j)\eqqcolon q_j$ に対するELBOの依存項を抜き出すと、 $q_j$ の最適解 $q^*_j$ は
 
+$$\log \tilde{p}(\pmb{X},\pmb{Z}_j)=\mathbb{E}_{i\neq j}[\log p(\pmb{X,Z})]+const.$$
+
+で定義される $\tilde{q}(\pmb{X},\pmb{Z}_j)$ に等しい、すなわち
+
+$$\begin{aligned}\log q_j^*(\pmb{Z}_j)=&\mathbb{E}_{i\neq j}[\log p(\pmb{X,Z})]+const.\\
+\Big(=&\int \log p(\pmb{X,Z})\prod_{i\neq j} q_i \mathrm{d} \pmb{Z_i}+const.\Big)
+\end{aligned}$$
+
+を満たすことがわかります[1]。この式から、因子 $q_j$ の最適解の対数は、観測データと隠れ変数の同時分布の対数を考え、 $i\neq j$ である他の因子 $\{q_i\}$ すべてについての期待値を取ったものに等しいことがわかります。
 
 ## 参考文献
 
