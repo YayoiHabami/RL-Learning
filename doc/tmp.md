@@ -15,6 +15,10 @@
     - [参考文献](#参考文献-1)
   - [価値関数・行動関数の記法](#価値関数行動関数の記法)
     - [参考文献](#参考文献-2)
+  - [リプレイバッファ（TF-Agents）](#リプレイバッファtf-agents)
+    - [TF-Agentsライブラリ](#tf-agentsライブラリ)
+    - [リプレイバッファ](#リプレイバッファ)
+    - [参考文献](#参考文献-3)
 
 
 ## 面白そうな文献
@@ -133,3 +137,68 @@ Sutton-Bartoの記法では、
 
 [A0] R.S. Sutton and A.G. Barto, "Reinforcement Learning: An Introduction" Second Edition, MIT Press, Cambridge, MA, 2018
 [A1] 現場で使える！ Python深層学習入門, 伊藤多一ほか, 翔泳社, 第1刷（Chapter 5.5）
+
+### リプレイバッファ（TF-Agents）
+
+#### TF-Agentsライブラリ
+
+TF-Agents ライブラリは、Tensorflow をベースとする強化学習ライブラリであり、OpenAI Gym や PyBullet ライブラリ、DeepMind の DM Control（ MuJoCo ベース）などをサポートします。基本的な強化学習アルゴリズム、効率のよいリプレイバッファや指標など強化学習に活躍する様々な機能を搭載しています。
+
+TF-Agents 環境は次のようにロードされます（いくつかの依存関係のインストールは必要ですが）。
+
+```python
+from tf_agents.environments import suite_gym
+env = suite_gym.load("Breakout-v4")
+```
+
+`env.reset()` や `env.step(1)` により学習を進めます。また、 `env.observation_spec()`, `env.action_spec()`, `env_time_step_spec()` により環境、行動、時間ステップの仕様を取得することが可能です。
+
+一般的にはTF-Agentsの訓練アーキテクチャは下記のように２つに分かれた形状を取ります[A1]。
+
+<img src="imgs/TF-Agentsの典型的な訓練アーキテクチャ.png" width=600>
+
+図１．TF-Agentsの典型的な訓練アーキテクチャ[A1]
+
+収集側では**ドライバ**が中心となり行動を選択しながら環境と相互作用し、軌跡を収集します。一方右側では**エージェント**が軌跡をもとに訓練を行い、方策の更新を行います。
+
+ここで、一般に環境は複数となりますが、これはCPU/GPUのパワーを活かしつつ相関の低い軌跡を収集するためです。また、ドライバが様々な収集作業の仲介を行うことで、全体としての柔軟性（拡張性）を向上させています。
+
+> 課題にあった環境を作成したい場合は、 `tf_agents.environments.py_environment` パッケージの `PyEnvironment` クラスを継承するカスタムクラスを作成し、 `action_spec()`, `observation_spec()`, `_reset()`, `_step()` といったメソッドをオーバーライドすることで実現できます。
+
+#### リプレイバッファ
+
+TF-Agents ライブラリは、`tf_agents.replay_buffers` パッケージで種々のリプレイバッファを実装しています。モジュール名の先頭が `py_` になっているものは純粋に Python で書かれたものであり、一方 `tf_` は TensorFlow ベースのものです。
+
+たとえば、一様サンプリングのリプレイバッファ（ `TFUniformReplayBuffer` クラス）は次のように使用することができます。
+
+```python
+from tf_agents.environments.tf_py_environments import TFPyEnvironment
+from tf_agents.agents.dqn.dqn_agent import DqnAgent
+from tf_agents.replay_buffers import tf_uniform_replay_buffer
+
+# 環境の設定をラップ
+tf_env = TFPyEnvironment(env)
+
+# エージェントの作成
+agent = DqnAgent(...)
+agent.initialize()
+
+# リプレイバッファの作成
+replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
+  data_spec=agent.collect_data_spec,
+  batch_size=tf_env.batch_size,
+  max_length=1000000)
+
+# オブザーバの作成
+replay_buffer_observer = replay_buffer.add_batch
+```
+
+ここで、`data_spec` はリプレイバッファに保存されるデータの使用、`batch_size` は各ステップで渡される軌跡の値（＝ドライバが一回の行動で収集する軌跡の数）です。また、リプレイバッファの上限 `max_length` を100万としていますが、これは2015年のDQN論文に従った値です。ただし、非常に大量のRAMを必要とします。
+
+最後の行ではリプレイバッファに軌跡を書き込むオブザーバを作成していますが、独自実装も可能です。
+
+> 余談：例えば `FrameStack4` ラッパーを使用する場合、本来必要な量の４倍のRAMを使用してしまいます（２つの連続した軌跡を保存したときに、２つめの軌跡の 3/4 は一つ前の軌跡と重複するため）。したがって、`tf_agents.replay_buffers.py_hashed_replay_buffer` パッケージの `PyHashedReplayBuffer` の使用も検討してよいかもしれません。
+
+#### 参考文献
+
+[A1] scikit-learn、Keras、TensorFlow による実線機械学習 第２版, Aurélien Géron, オライリージャパン, 第１刷（Chapter 18.12）
