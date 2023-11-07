@@ -268,9 +268,7 @@ $$\displaystyle\sum_{i=1}^n\lambda_if(x_i)\ge f\left(\sum_{i=1}^n\lambda_ix_i\ri
 
 上図は凸包をの網掛け領域で表し、左辺 $\sum_{i=1}^3\lambda_if(x_i)$ に基づく赤い点が、右辺 $f(\sum_{i=1}^3\lambda_ix_i)$ に基づく青い点よりも上に存在していることを示した図です。
 
-> **凸関数**とは、 $f(x)=x^2$ のような、曲線上の任意の2点<sup>補足</sup>を結ぶ線分が関数の上に存在するような関数です。いわゆる「下に凸な関数」と言えると思います。
-> 
-> <sup>※補足：実際は任意の $x_1,x_2$ に対する２点 $(x_1,f(x_1)), (x_2,f(x_2))$</sup>
+> **凸関数**とは、 $f(x)=x^2$ のような、曲面上の任意の2点を結ぶ線分が関数の上に存在するような関数です。いわゆる「下に凸な関数」と言えると思います。より正確には、 $E^n$ において凸集合 $S\subset E^n$ 上で定義される関数 $f\colon S\to E^1$ に対して、 $n=2$ のときのイエンゼンの不等式（ $\lambda_1 f(\pmb{x}_1)+(1-\lambda_1)f(\pmb{x}_2)\geq f\big(\lambda_1 \pmb{x}_1+(1-\lambda_1)\pmb{x}_2\big)$ ）が成り立つような関数です（ $E$ は $\R$ など何らかの集合 ）[A20]。
 
 連続値の場合にも同様の議論が可能であり、
 
@@ -402,3 +400,5 @@ $$\log{\int {\frac{p_\pi(\tau)p(\mathcal O=1|\tau)}{q(\tau)}q(\tau)d\tau}}\geq \
 [A18] [Metric space](https://en.wikipedia.org/wiki/Metric_space)
 
 [A19] [Kullback-Leibler Divergenceについてまとめる](https://yul.hatenablog.com/entry/2019/01/07/152738)
+
+[A20] 凸解析と最適化理論, 田中謙輔, オーム社, 第１刷
