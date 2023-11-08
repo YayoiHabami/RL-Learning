@@ -78,6 +78,8 @@ $$P(\tau|e_{1\colon T}=1)\propto \exp\left(\sum_{t=0}^T r(s_t,a_t)\right)$$
 
 ## 推論
 
+ここからは余談となりますが、どのように推論を行うかについて、厳密な推論
+
 ### 厳密推論：Forward-backward アルゴリズム
 
 前節では（全時間ステップにわたる）最適な軌道分布のモデルを作成しました。次に、ある時間ステップ $t$ までの履歴をもとにした、それ以降の最適な行動（の分布）を考えます。一般には、この分布は
@@ -98,6 +100,58 @@ $$\pi_t(a|s)=P(A_t=a|S_t=s,e_{t\colon T}=1)\tag{7}$$
 2. 順方向伝達： 前項とベイズの定理から $P(A_t=a|S_t=s,e_{t\colon T}=1)$ を計算
 
 > forward-backward アルゴリズム：HMM の推論手法であり、観測のもとでにすべての隠れ変数の事後周辺確率を計算します。順方向確率を計算する段階（*forward-step*）と逆方向確率を求める段階（*backward-step*）、および平滑化段階の３段階から構成されます[3]。
+
+#### 逆方向伝達（*backward message passing*）
+
+この段階では、逆方向メッセージ（*backward message*）をそれぞれ次のように計算します。
+
+$$\begin{aligned}
+P(e_{t\colon T}=1|A_t=a,S_t=a)=&e^{r(s,a)}\mathbb{E}_{s'\sim T(\cdot|s,a)}\big[P(e_{t+1\colon T}=1|S_{t+1}=s')\big]\\
+P(e_{t\colon T}=1|S_t=s)=&\mathbb{E}_a\big[P(e_{t\colon T}=1|S_t=s,A_t=a)\big]
+\end{aligned}\tag{8}$$
+
+> すなわち、逆方向メッセージはそれぞれ $P(e_{t\colon T}=1|A_t=a,S_t=a)$ が $P(e_{t+1\colon T}=1|S_{t+1}=s')$ から、 $P(e_{t\colon T}=1|S_t=s)$ が $P(e_{t\colon T}=1|S_t=s,A_t=a)$ から、**再帰的に**計算されます。
+
+上の式を理解するために、対数確率空間を考えることにます。はじめに、逆方向メッセージを用いて
+
+$$\begin{aligned}Q_t(s,a)=&\log P(e_{t\colon T}=1|A_t=a,S_t=a)\\V_t(s)=&\log P(e_{t\colon T}=1|S_t=s)\end{aligned}$$
+
+を定義します。ここで $\log\mathbb{E}[\exp(f(X))]\eqqcolon\mathrm{soft}\max_X f(X)\space\big(\approx \max_X f(X)\big)$ とすれば、上の式は次のように書き直すことができます。
+
+$$\left\{\begin{aligned}Q_t(s,a)=&r(s,a)+\mathrm{soft}\max_{s'} V_{t+1}(s')\\V_t(s)=&\mathrm{soft}\max_a Q_t(s,a)\end{aligned}\right.\tag{9}$$
+
+> $\mathrm{soft}\max$ ：ソフトマックス関数 $\sigma\colon\R^K\to(0,1)^K\colon\sigma (\pmb{x})=e^{\pmb{x}} / \sum_{x} e^x$ とは異なります
+
+ここで $Q_t,V_t$ はそれぞれ通常の強化学習における行動価値関数 $Q(\cdot|\cdot)$ 、価値関数 $V(\cdot)$ にならった表現です。以下では**ソフト行動価値関数** $Q_t$ **ソフト価値関数** $V_t$ と呼称し、また上の連立方程式を**ソフトベルマン方程式**（*soft Bellman backup equations*）と呼ぶことにします。このとき、新しく定義したソフトな関数は次のような意味を持ちます。
+
+- $V_t$ : 行動に対する「ソフトな」最大値（厳密な最大値ではない）
+- $Q_t$ : 次の状態に対する「ソフトな」最大値（期待値ではない）
+  - 通常のQ関数と比較し、高い確率でそこそこよい状態になる選択よりも、確率は低いがとてもよい状態になる可能性のある選択を行うようになります（「楽観的」になる）
+
+> 補足：式 $(9)$ への式変形
+>
+> 式 $(8)$ を代入すれば、$Q_t, S_t$ は次のようになります。これに $\log\mathbb{E}[\exp(f(X))]=\mathrm{soft}\max_X f(X)$ を適用すれば式 $(9)$ を導出できます。
+>
+> $$\begin{aligned}Q_t(s,a)=&r(s,a)+\log\mathbb{E}_{s'\sim T(\cdot|s,a)}\big[e^{V_{t+1}(s')}\big]\\V_t(s)=&\log\mathbb{E}_a\left[e^{Q_t(s,a)}\right]\end{aligned}$$
+
+#### 逆方向伝達（*forward message passing*）
+
+上で求めた $Q_t, V_t$ を用いれば、ベイズの定理より最適方策は
+
+$$\begin{aligned}P(A_t=a|S_t=s,e_{t\colon T}=1)=&\frac{P(e_{t\colon T}=1|A_t=a,S_t=s)P(A_t=a|S_t=s)}{P(e_{t\colon T}=1|S_t=s)}\\
+=&\frac{e^{Q_t(s,a)}C}{e^{V_t(s)}}\\
+\propto &\exp(Q_t(s,a)-V_t(s))\\
+\propto &\exp(A_t(s,a))\end{aligned}$$
+
+すなわち、ソフト価値関数を計算できれば、最適方策を $\exp(Q_t(s,a)-V_t(s))$ として求めることができます。
+
+### 近似推論
+
+前節で述べた厳密手法はQ関数の更新が「楽観的」になるため、確率的なダイナミクスの場合にはあまり適しません[2]。したがって、大規模な確率モデルに適用するために、近似手法を用いた推論アルゴリズムが存在します。
+
+有名な近似推論手法が、変分推論を導入した **SAC**（*Soft Actor-Critic*）です。SACはオフポリシーであるため、リプレイバッファが可能です。
+
+また、SACに対して環境に不確実性を仮定した拡張が**SLAC**（*Stochastic Laten Actor Critic*）です。潜在変数モデルによるSACの素直な拡張となっており、POMDPへ対応できるようになっています。SAC同様リプレイバッファを使用でき、またモデルフリーでもあります。
 
 ## 参考文献
 
