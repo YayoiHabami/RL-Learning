@@ -17,7 +17,8 @@
     - [参考文献](#参考文献-2)
   - [リプレイバッファ（TF-Agents）](#リプレイバッファtf-agents)
     - [TF-Agentsライブラリ](#tf-agentsライブラリ)
-    - [リプレイバッファ](#リプレイバッファ)
+    - [経験のリプレイ（*Experience Replay*）](#経験のリプレイexperience-replay)
+    - [実装：リプレイバッファ](#実装リプレイバッファ)
     - [参考文献](#参考文献-3)
 
 
@@ -165,7 +166,23 @@ env = suite_gym.load("Breakout-v4")
 
 > 課題にあった環境を作成したい場合は、 `tf_agents.environments.py_environment` パッケージの `PyEnvironment` クラスを継承するカスタムクラスを作成し、 `action_spec()`, `observation_spec()`, `_reset()`, `_step()` といったメソッドをオーバーライドすることで実現できます。
 
-#### リプレイバッファ
+#### 経験のリプレイ（*Experience Replay*）
+
+経験のリプレイ（*experience replay*; ER）とは、遷移（一般には $\{s_t,a_t,r_t,s_{t+1},d_t\}$ の組）を一時的に**リプレイバッファ**（*replay buffer* or *replay memory*）と呼ばれる領域に保存しておき、訓練時にはこれをランダムに取り出すことで学習に用いるという手法です[A2]。主な目的はサンプル効率の向上であり、特にそのコストが高い環境（高精度なシミュや実機でのテストなど）のような過去の経験を再利用することが望ましい環境で用いられます。
+
+*Prioritized Experience Replay*（PER）をはじめとして様々な拡張モデルが提案されていますが、一般には ER の「最適方策への収束性」や「収束速度」についての改善手法であると考えられます[A3]。
+
+> PER：保存された各遷移 $i$ について、その TD 誤差 $\delta_i$ をもとに遷移の重要度 $p_i$ を決定するような手法[A2]です。重要度は $p_i=|\delta_i|+\epsilon$ または $p_i=\frac1{rank(i)}$ ( $i$ : $|\delta_i|$ でソートした際の順位）が提案されており、後者の方が頑強ではあるものの、多くのライブラリが前者を採用しているようです。この重要度を用いて、実際にサンプルされる確率 $P(i)=(p_i)^\alpha / \sum_k (p_k)^\alpha\space (\alpha\geq0)$ が決定されます。
+
+一方、一部の強化学習においては ER を使用することはできないようです。適用が不可能であるのは、方策勾配法に連なるもの、具体的には目的関数に **「現在の」戦略の期待値** を利用する類のアルゴリズムです[A4]。例えば方策勾配法においては、目的関数は
+
+$$\mathcal{J}(\theta)\propto \sum_{s\in\mathcal{S}}{d^{\pi_\theta}(s)\sum_{a\in\mathcal{A}}{\pi_\theta(a|s)Q^{\pi_\theta}(s,a)}}$$
+
+に従います。方策 $\pi_\theta$ の下で、「状態に遷移する確率」×「その状態での行動確率」×「行動の価値」、すなわち現在の方策の期待値を計算しています。したがって、これに対して過去の経験を与えてしまうと現在の方策の良し悪しを判断することができなくなってしまうようです。
+
+当然解決手法もあり、例えば探索用（リプレイバッファ蓄積用）の方策を別途設ける手法（*Actor-Critic with Experience Replay*; ACER）や、方策を価値関数に従った決定的なものとする手法（*Deep Deterministic Policy Gradient*; DDPG など）などが提案されています。
+
+#### 実装：リプレイバッファ
 
 TF-Agents ライブラリは、`tf_agents.replay_buffers` パッケージで種々のリプレイバッファを実装しています。モジュール名の先頭が `py_` になっているものは純粋に Python で書かれたものであり、一方 `tf_` は TensorFlow ベースのものです。
 
@@ -195,10 +212,18 @@ replay_buffer_observer = replay_buffer.add_batch
 
 ここで、`data_spec` はリプレイバッファに保存されるデータの使用、`batch_size` は各ステップで渡される軌跡の値（＝ドライバが一回の行動で収集する軌跡の数）です。また、リプレイバッファの上限 `max_length` を100万としていますが、これは2015年のDQN論文に従った値です。ただし、非常に大量のRAMを必要とします。
 
-最後の行ではリプレイバッファに軌跡を書き込むオブザーバを作成していますが、独自実装も可能です。
+最後の行ではリプレイバッファに軌跡を書き込むオブザーバを作成していますが、独自実装も可能です。ここではリプレイバッファの実装について概要を示しましたが、より詳細な実装はTensorFlowの[ドキュメント](https://www.tensorflow.org/agents/tutorials/5_replay_buffers_tutorial)などが参考になります。
 
 > 余談：例えば `FrameStack4` ラッパーを使用する場合、本来必要な量の４倍のRAMを使用してしまいます（２つの連続した軌跡を保存したときに、２つめの軌跡の 3/4 は一つ前の軌跡と重複するため）。したがって、`tf_agents.replay_buffers.py_hashed_replay_buffer` パッケージの `PyHashedReplayBuffer` の使用も検討してよいかもしれません。
 
 #### 参考文献
 
 [A1] scikit-learn、Keras、TensorFlow による実線機械学習 第２版, Aurélien Géron, オライリージャパン, 第１刷（Chapter 18.12）
+
+[A2] [【強化学習】Experience Replayの理論](https://zenn.dev/ymd_h/articles/c3ba23033a6442)
+
+[A3] [【強化学習】Experience Replay の研究の傾向とその考察](https://zenn.dev/ymd_h/articles/8261cb7b9fb925)
+
+[A4] [Replay BufferがPolicy Gradientで使えない理由](https://medium.com/programming-soda/replay-buffer%E3%81%8Cpolicy-gradient%E3%81%A7%E4%BD%BF%E3%81%88%E3%81%AA%E3%81%84%E7%90%86%E7%94%B1-57801f439aa6)
+
+[A5] [Replay Buffers](https://www.tensorflow.org/agents/tutorials/5_replay_buffers_tutorial)
