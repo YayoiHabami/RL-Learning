@@ -2,6 +2,21 @@
 
 **Control as Inference**は強化学習を統一的な枠組みで議論するために、強化学習の最適制御やプランニングを**推論**（*inference*）とみなすという考え方です。
 
+## 目次
+
+- [Control as Inference](#control-as-inference)
+  - [目次](#目次)
+  - [MDPの軌跡](#mdpの軌跡)
+  - [軌跡と最適性](#軌跡と最適性)
+    - [最適な軌跡](#最適な軌跡)
+  - [推論](#推論)
+    - [厳密推論：Forward-backward アルゴリズム](#厳密推論forward-backward-アルゴリズム)
+      - [逆方向伝達（*backward message passing*）](#逆方向伝達backward-message-passing)
+      - [逆方向伝達（*forward message passing*）](#逆方向伝達forward-message-passing)
+    - [近似推論](#近似推論)
+  - [参考文献](#参考文献)
+
+
 ## MDPの軌跡
 
 以下では、ステップ数 $T$ の有限MDP（*finite Marcov decision process*）をMDPと呼称します。また、以下の議論は容易にステップ数が無限大の場合に拡張できるようです[1]。加えて、以下ではMDPを $(\mathcal{S,A,T},\rho,R)$ の組とします。ここで、 $\mathcal{S,A}$ はそれぞれ状態空間と行動空間、 $T(\cdot|s,a)$ は遷移関数（kernel）、 $\rho$ は初期状態分布、 $R$ は報酬とします。
@@ -30,9 +45,9 @@ P(\tau)=&P(S_0=s_0)\prod_{t=0}^{T-1}{P(A_t=a)P(S_{t+1}=s_{t+1}|S_t=s_t,A_t=a_t)}
 \propto&\rho(s_0)\prod_{t=0}^{T-1}{T(s_{t+1}|s_t,a_t)}
 \end{aligned}$$
 
-ここから、グラフィカルモデルの軌跡の確率 $P(\tau)$ は、MDPのダイナミクスの確率（右辺）に比例するということがわかります。さらには、ダイナミクスが決定論的である場合、確率 $P(\tau)$ はすべての軌道 $\tau$ について等しくなります。
+ここから、グラフィカルモデルの軌跡の確率 $P(\tau)$ は、MDPのダイナミクスの確率（右辺）に比例するということがわかります。さらには、ダイナミクスが決定論的である場合、確率 $P(\tau)$ はすべての軌跡 $\tau$ について等しくなります。
 
-> 確率 $P(\tau)$ がすべての軌道 $\tau$ について等しくなることを、 $P(\tau)\propto 1\{\mathrm{Feasible}\}$ とも書くようです。
+> 確率 $P(\tau)$ がすべての軌跡 $\tau$ について等しくなることを、 $P(\tau)\propto 1\{\mathrm{Feasible}\}$ とも書くようです。
 
 ## 軌跡と最適性
 
@@ -54,9 +69,9 @@ $$P(\mathrm{All}\space e_t=1|\tau)=\exp\left(\sum_{t=0}^T r(s_t,a_t)\right)P(\ta
 
 図２．最適性を導入したMDPのグラフィカルモデル[1]
 
-### 最適な軌道
+### 最適な軌跡
 
-ここまでで、最適な軌道の分布を説明するモデル（式 $(5)$ ）を作ることができました。全時間ステップに渡って最適であるような、**最適軌跡分布**（*optimal trajectory distribution*）を次のように定義すれば、
+ここまでで、最適な軌跡の分布を説明するモデル（式 $(5)$ ）を作ることができました。全時間ステップに渡って最適であるような、**最適軌跡分布**（*optimal trajectory distribution*）を次のように定義すれば、
 
 $$\pi_{optimal}(\tau)=P(\tau|\mathrm{All}\space e_t=1)=P(\tau|e_{1\colon T}=1)\tag{6}$$
 
@@ -82,7 +97,7 @@ $$P(\tau|e_{1\colon T}=1)\propto \exp\left(\sum_{t=0}^T r(s_t,a_t)\right)$$
 
 ### 厳密推論：Forward-backward アルゴリズム
 
-前節では（全時間ステップにわたる）最適な軌道分布のモデルを作成しました。次に、ある時間ステップ $t$ までの履歴をもとにした、それ以降の最適な行動（の分布）を考えます。一般には、この分布は
+前節では（全時間ステップにわたる）最適な軌跡分布のモデルを作成しました。次に、ある時間ステップ $t$ までの履歴をもとにした、それ以降の最適な行動（の分布）を考えます。一般には、この分布は
 
 $$\pi_t(a|s)=P(A_t=a|S_t=s,e_{1\colon T}=1)$$
 
