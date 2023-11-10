@@ -4,17 +4,16 @@
 
 ## 目次
 
-- [Control as Inference](#control-as-inference)
-  - [目次](#目次)
-  - [MDPの軌跡](#mdpの軌跡)
-  - [軌跡と最適性](#軌跡と最適性)
-    - [最適な軌跡](#最適な軌跡)
-  - [推論](#推論)
-    - [厳密推論：Forward-backward アルゴリズム](#厳密推論forward-backward-アルゴリズム)
-      - [逆方向伝達（*backward message passing*）](#逆方向伝達backward-message-passing)
-      - [逆方向伝達（*forward message passing*）](#逆方向伝達forward-message-passing)
-    - [近似推論](#近似推論)
-  - [参考文献](#参考文献)
+- [目次](#目次)
+- [MDPの軌跡](#mdpの軌跡)
+- [軌跡と最適性](#軌跡と最適性)
+  - [最適な軌跡](#最適な軌跡)
+- [推論](#推論)
+  - [厳密推論：Forward-backward アルゴリズム](#厳密推論forward-backward-アルゴリズム)
+    - [逆方向伝達（*backward message passing*）](#逆方向伝達backward-message-passing)
+    - [逆方向伝達（*forward message passing*）](#逆方向伝達forward-message-passing)
+  - [近似推論](#近似推論)
+- [参考文献](#参考文献)
 
 
 ## MDPの軌跡
