@@ -1,18 +1,17 @@
 # 準備
 
-## はじめに
-
-強化学習は機械学習の一種であり、報酬という概念が出てくるという点、その期待値を最大化するような逐次的意思決定ルールを学習することを目的とする点が特徴的です。ここで、逐次的意思決定ルールは**方策**（*policy*）と呼ばれます。また一般に、強化学習では**マルコフ性**という仮定をおきます。これらについて説明を行っていきます。
+強化学習は機械学習の一種であり、報酬という概念が出てくるという点、その期待値を最大化するような逐次的意思決定ルールを学習することを目的とする点が特徴的です。ここで、逐次的意思決定ルールは**方策**（*policy*）と呼ばれます。また一般に、強化学習ではその学習環境に**マルコフ性**という仮定をおきます。本項では、これらについて順を追って説明を行っていきます。
 
 ## 目次
 
-- [はじめに](#はじめに)
 - [目次](#目次)
 - [逐次的意思決定問題](#逐次的意思決定問題)
   - [マルコフ性](#マルコフ性)
   - [マルコフ決定過程](#マルコフ決定過程)
 - [方策](#方策)
-  - [方策の分類 (not ok)](#方策の分類-not-ok)
+  - [方策の分類](#方策の分類)
+  - [方策の要素数](#方策の要素数)
+  - [方策の妥当性](#方策の妥当性)
 - [定式化](#定式化)
   - [概観：逐次的意思決定問題](#概観逐次的意思決定問題)
   - [MDPの表現の統一](#mdpの表現の統一)
@@ -24,7 +23,7 @@
 
 ## 逐次的意思決定問題
 
-強化学習が目的とする方策の最適化問題、すなわち**逐次的意思決定問題**（*sequential decision-making problem*）を解くために必要な概念について学習していきます。
+はじめに、強化学習が目的とする方策の最適化問題、すなわち**逐次的意思決定問題**（*sequential decision-making problem*）を解くために必要な概念について学習していきます。
 
 ### マルコフ性
 
@@ -50,8 +49,8 @@ $$\mathrm{Pr}(X_{t+k}=x|X_s=x_s,\forall s\leq t)=\mathrm{Pr}(X_{t+k}=x|X_t=x_t)$
 
 |名称|定義|
 |:-:|-|
-|有限状態集合| $\mathcal{S}\triangleq\{s^1,...,s^{\|\mathcal{S}\|}\}\ni s$ |
-|有限行動集合| $\mathcal{A}\triangleq\{a^1,...,a^{\|\mathcal{A}\|}\}\ni a$ |
+|有限状態集合| $\mathcal{S}\triangleq\{s_1,...,s_{\|\mathcal{S}\|}\}\ni s$ |
+|有限行動集合| $\mathcal{A}\triangleq\{a_1,...,a_{\|\mathcal{A}\|}\}\ni a$ |
 |初期状態確率関数| $p_{s_0}\colon\mathcal{S}\to[0,1]\colon p_{s_0}(s)\triangleq\mathrm{Pr}(S_0=s)$ |
 |状態遷移確率関数| $p_T\colon\mathcal{S\times S\times A}\to[0,1]\colon$ |
 |〃| $p_T(s'\|s,a)\triangleq\mathrm{Pr}(S_{t+1}=s'\|S_t=s,A_t=a),\space\forall t\in\mathbb{N}_0$ |
@@ -97,60 +96,105 @@ $$\Pi\triangleq\left\{\pi\colon\mathcal{A\times S}\to[0,1]\colon\sum_{a\in\mathc
 
 ## 方策
 
-上で述べたように、エージェントは方策に従い行動を決定します。この方策について、以下ではMDPに関するものを定義します。
+上で述べたように、エージェントは方策に従い行動を決定します。以下ではこの方策について分類を行い、一部については簡易的にその特徴を記述します[1]。
 
 > 一般的に機械学習の分野では、上記のような行動や選択を行う学習者のことを**エージェント**（*agent*）と呼びます。また、学習で扱う系全体のことは**環境**（*environment*）と呼びます。例として、家でハイハイを学習する赤ちゃんをこれに見立てれば、赤ちゃんはエージェントであり、その環境は家といえます。
 
-### 方策の分類 (not ok)
+本章は全体に大きく影響はしません。したがって、方策を分類する基準には次のようなものが設けられること（図１）、
 
-式 $(2)$ で定義した確率的方策 $\pi$ の集合 $\Pi$ の部分集合として、**決定的方策**（*deterministic policy*） $\pi^d$ の集合 $\Pi^d$ を定義できます。
+- **定常**か**非定常**か
+- **マルコフ性**の有無（無し：履歴依存）
+- **決定的**か**確率的**か
 
-$$\Pi^d\triangleq\{\pi^d\colon\mathcal{S\to A}\}\tag5$$
+および方策の最適化を容易にするために極力小さい集合（*subset*; 部分集合）の方策を取り扱いたいこと、の２点を理解できれば十分だと思います。
 
-また、
+### 方策の分類
 
-$$\pi(a|s)\coloneqq\left\{\begin{aligned}
+はじめに、方策の系列 $\pmb{\pi}$ およびその集合 $\pmb{\Pi}$ 
+
+$$\pmb{\pi}\triangleq\{\pi_0,\pi_1,...\}\in\pmb{\Pi}$$
+
+を考えます。ここで、 $\pi_k$ は時間ステップ $t=k\in\N_0$ の方策であり、方策系列は時々刻々と変化するような方策の全体を捉えることができます。この方策系列の集合 $\pmb{\Pi}$ という観点から、方策全体について分類を行います。
+
+式 $(2)$ で定義した方策は時間依存ではない、すなわち**定常**（*stationary*）な確率的方策でした。この系列を $\pmb{\pi}^s$ 、その集合を $\pmb{\Pi}^{\mathrm{S}}$ とすれば次のように書けます。
+
+$$\pmb{\pi}^s\triangleq \{\pi,\pi,...\}\in\pmb{\Pi}^{\mathrm{S}}\tag{7}$$
+
+次に、上の方策系列の集合のうち、**決定的**（*deterministic*）な方策 $\pi^d$ による系列を $\pmb{\pi}^{sd}$ 、その集合を $\pmb{\Pi}^{\mathrm{SD}}$ とすれば、
+
+$$\pmb{\pi}^{sd}\triangleq \{\pi^d,\pi^d,...\}\in\pmb{\Pi}^{\mathrm{SD}}\tag{8}$$
+
+> 決定的な（マルコフ）方策：確率分布 $\pi\colon\mathcal{S\times A}\to[0,1]$ ではなく $\pi\colon\mathcal{S\to A}$ で定義される方策です。次のように書けることから、 $\pmb{\Pi}^{\mathrm{SD}}\subset\pmb{\Pi}^{\mathrm{S}}$ です。
+>
+> $$\pi(a|s)\coloneqq\left\{\begin{aligned}
 &1\space&(a=\pi^d(s))\\
 &0\space&(それ以外)
 \end{aligned}\right.,\space\forall (s,a)\in\mathcal{S\times A}$$
 
-のように $\pi^d$ を確率的方策 $\pi$ の形式に書き直すことができ、 $\Pi^d\subset\Pi$ がわかります。
+次に、式 $(7)$ をもとに**非定常な**、すなわち時間ステップごとに方策が変化するような方策系列 $\pmb{\pi}^m$ と、その集合 $\pmb{\Pi}^{\mathrm{M}}$ を次のように定義します。
 
-上に定義した $\pi$ や $\pi^d$ は状態 $s$ にのみ依存し、過去の経験には独立であることから**マルコフ方策**（*Markov policy*）といいます。さらに、時間ステップ $t$ にも依存しないことから**定常なマルコフ方策**（*stationary Markov policy*）とも呼ばれます。一方、非定常な方策系列
+$$\pmb{\pi}^m\triangleq\{\pi_0,\pi_1,...\}\in\pmb{\Pi}^\mathrm{M}$$
 
-$$\pmb{\pi}^m\triangleq\{\pi_0\in\Pi,\pi_1\in\Pi,...\}\in\Pi^M\tag6$$
+ここで、すべての方策 $\pi_0,\pi_1,...\colon\mathcal{S\times A}\to[0,1]$ はマルコフ性を持った方策です。
 
-や、時間不定の定常な方策の系列（式 $(2),(5)$ ）
+最後に、マルコフ性を持たない、すなわち**履歴依存な**方策を考えます。ある時間ステップ $t$ における履歴を $h_t$ 、その集合を $\mathcal{H}_t$ とすれば、履歴依存な方策は
 
-$$\begin{align}
-\pmb{\pi}^s&\triangleq\{\pi,\pi,...\}\in\Pi^S,&\pi\in\Pi\tag{7}\\
-\pmb{\pi}^sd&\triangleq\{\pi^d,\pi^d,...\}\in\Pi^{SD},&\pi^d\in\Pi^d\tag{8}\\
-\end{align}$$
+$$\pi_t^h\colon\mathcal{A}\times\mathcal{H}_t\to[0,1],
+\space\pi_t^h(a|h_t)\triangleq\mathrm{Pr}(A=a,|H_t=h_t)\tag{10}$$
 
-を定義できます。
+で定義でき、履歴依存な方策系列 $\pmb{\pi}^h$ および集合 $\pmb{\Pi}^{\mathrm{H}}$ は、
 
-一方、現在の状態に加えてそれ以前の経験にも依存する非マルコフ方策も考えることができます。MDPにおいて、現在の時間ステップ $t$ までのすべての経験の履歴は
+$$\pmb{\pi}^h\triangleq\{\pi_0^h,\pi_1^h,...\}\in\pmb{\Pi}^\mathrm{H}$$
 
-$$\{s_0,a_0,r_0,...,s_{t-1},a_{t-1},r_{t-1},s_t\}\triangleq h_t\in\mathcal{H}_t\tag{9}$$
+と定義することができます。
 
-で定義されます。これに基づき行動選択確率を決めるような履歴依存の方策
+> 環境がMDPでモデル化された場合、時刻 $t$ までの（すべての経験の）履歴は次のように書くことができます。
+>
+> $$h_t=\{s_0,a_0,r_0,...,s_{t-1},a_{t-1},r_{t-1},s_t\}$$
 
-$$\begin{aligned}&\pi_t^h\colon\mathcal{A}\times\mathcal{H}_t\to[0,1],\\
-&\pi_t^h(a|h_t)\triangleq\mathrm{Pr}(A=a,|H_t=h_t)\end{aligned}\tag{10}$$
+以上から、方策（の系列）を $\pmb{\Pi}^{\mathrm{SD}},\pmb{\Pi}^\mathrm{S},\pmb{\Pi}^\mathrm{M},\pmb{\Pi}^\mathrm{H}$ のもとで分類した場合、方策系列の集合は次のような包含関係を持つことがわかります。
 
-も定義できます。任意の $\pi_t^h$ を含む方策集合を
-
-$$\Pi_t^h\triangleq\left\{\pi_t^h\colon\mathcal{A}\times\mathcal{H}_t\to[0,1]\colon\sum_{a\in\mathcal{A}}{\pi_t^h(a|h_t)=1}\right\}\tag{11}$$
-
-と表記し、その系列を
-
-$$\pmb{\pi}^h\triangleq\{\pi_0^h,\pi_1^h,...\}\in\pmb{\Pi}^H\triangleq(\Pi_t^h)_{t\in\mathbb{N}_0}\tag{12}$$
-
-とします。以上の系列は、下記のような包含関係を持ちます。
-
-$$\pmb{\Pi}^{SD}\subseteq\pmb{\Pi}^S\subseteq\pmb{\Pi}^M\subseteq\pmb{\Pi}^H$$
+$$\pmb{\Pi}^{\mathrm{SD}}\subseteq\pmb{\Pi}^\mathrm{S}\subseteq\pmb{\Pi}^\mathrm{M}\subseteq\pmb{\Pi}^\mathrm{H}\tag{13}$$
 
 <img src="imgs/方策集合の種類.png" width=500>
+
+図１．４分類 $\pmb{\Pi}^{\mathrm{SD}},\pmb{\Pi}^\mathrm{S},\pmb{\Pi}^\mathrm{M},\pmb{\Pi}^\mathrm{H}$ のもとでの方策の包含関係
+
+### 方策の要素数
+
+図１から、$\pmb{\Pi}^\mathrm{H}$ に含まれる方策（系列）のなかで最もすぐれた方策を探し出せば、それ以上によい方策は存在しないことがわかります。また、包含関係 $(13)$ から、方策系列を引数とする任意の目的関数について
+
+$$\max_{\pmb{\pi}\in\pmb{\Pi}^{\mathrm{SD}}}f(\pmb{\pi})\leq\max_{\pmb{\pi}\in\pmb{\Pi}^{\mathrm{S}}}f(\pmb{\pi})\leq\max_{\pmb{\pi}\in\pmb{\Pi}^{\mathrm{M}}}f(\pmb{\pi})\leq\max_{\pmb{\pi}\in\pmb{\Pi}^{\mathrm{H}}}f(\pmb{\pi})$$
+
+がいえ、より大きな方策系列の集合から方策（系列）を探したほうがよいように見えます。では、探索の容易さはどのように変わるでしょうか。状態数 $|\mathcal{S}|$ 、行動数 $|\mathcal{A}|$ である有限の $T$ 時間ステップ長のMDPの下で、決定的な方策系列 $\pmb{\Pi}^{\mathrm{SD}},\pmb{\Pi}^{\mathrm{MD}},\pmb{\Pi}^{\mathrm{HD}}$ の要素数を考えます。これらは、
+
+$$\begin{aligned}
+  |\pmb{\Pi}^{\mathrm{SD}}|=&|\mathcal{A}|^{|\mathcal{S}|}\\
+  |\pmb{\Pi}^{\mathrm{MD}}_{0:T}|=&\prod_{t=0}^T|\pmb{\Pi}^{\mathrm{SD}}|=\left(|\mathcal{A}|^{|\mathcal{S}|}\right)^{T+1}\\
+  |\pmb{\Pi}^{\mathrm{HD}}_{0:T}|=&\prod_{t=0}^T|\Pi_t^{h,d}|=\prod_{t=0}^T|\mathcal{A}|^{|\mathcal{H}_t|}=\prod_{t=0}^T|\mathcal{A}|^{|\mathcal{S}|^{t+1}|\mathcal{A}|^t}
+\end{aligned}$$
+
+のように計算できます。ここで、 $\Pi_t^{h,d}$ は時間ステップ $t$ での履歴依存の決定的方策の集合であり、履歴依存の方策 $\pi^{h,d}$ を用いて次のように定義されます。
+
+$$\Pi_t^{h,d}\triangleq\{\pi^{h,d}\colon\mathcal{H}_t\to\mathcal{A}\}$$
+
+> $\pmb{\Pi}^{\mathrm{MD}},\pmb{\Pi}^{\mathrm{HD}}$ : それぞれ $\pmb{\Pi}^{\mathrm{M}},\pmb{\Pi}^{\mathrm{H}}$ のうち決定的な方策系列の部分集合です。決定的でない（確率的な）方策系列の集合の要素数は可算個ではないため、簡便のために決定的な方策のみ扱いました。
+
+> $\pmb{\Pi}^{\mathrm{MD}}_{0:T},\pmb{\Pi}^{\mathrm{HD}}_{0:T}$ : それぞれ時刻 $0$ から　$T$ で定義された（時間ステップ長 $t$ の） $\pmb{\Pi}^{\mathrm{MD}},\pmb{\Pi}^{\mathrm{HD}}$ です。
+
+上に計算した要素数をもとに、 $|\mathcal{A}|=2,|\mathcal{S}|=2$ とした場合について、方策系列の数がどのようになるかを下表に示します。
+
+表１．状態数 $|\mathcal{S}|=2$ 、行動数 $|\mathcal{A}|=2$ の有限長 $T$ MDPにおける方策のサイズ[0]
+
+|時間ステップ長 $T$ | $0$ | $1$ | $2$ | $3$ ||
+|:-:|:-|:-|:-|:-|-|
+| $\|\pmb{\Pi}^{\mathrm{SD}}\|$ | $2^2$ | $2^2$ | $2^2$ | $2^2$ | $=4$ |
+| $\|\pmb{\Pi}^{\mathrm{MD}}_{0:T}\|$ | $2^2$ | $2^4$ | $2^6$ | $2^8$ | $=256$ |
+| $\|\pmb{\Pi}^{\mathrm{HD}}_{0:T}\|$ | $2^2$ | $2^{10}$ | $2^{42}$ | $2^{170}$ | $\simeq 10^{51}$ |
+
+表１を見ると、より上位の集合ほど（*superset*; 図１）その要素数が爆発的に増大しています。上表で取り扱ったのはごく小規模のMDPでしたが、これですらも上位の方策系列の集合を対象とするのは現実的でないことがわかります。
+
+### 方策の妥当性
 
 ## 定式化
 
@@ -158,7 +202,7 @@ $$\pmb{\Pi}^{SD}\subseteq\pmb{\Pi}^S\subseteq\pmb{\Pi}^M\subseteq\pmb{\Pi}^H$$
 
 逐次的意思決定問題の学習においては方策 $\pi$ のみを調整します。環境（MDPの場合は $\{\mathcal{S,A},p_{s_0},p_T,g\}$ ）は一般に時間不変であり、最初に課題を設定した時点で決定されます。環境のモデルが既知である場合（モデルベース）はそれ自体から方策を最適化することが可能であり、このようなケースは**学習**（*learning*）の代わりに**プランニング**（*planning*）とよぶことも多いです。プランニングの場合に用いられる基礎的な最適化手法としては動的計画法や線形計画法などがあります。
 
-一方環境のモデルが未知である場合はデータからの学習が必要です。バッチ学習の場合は与えられたデータを利用することのみを考えればよいですが、オンライン学習では局所最適解に陥ることを防ぐため**探索と活用のトレードオフ**（**exploration-exploitation trade-off*）を考慮しながらデータを収集することになります。
+一方環境のモデルが未知である場合はデータからの学習が必要です。バッチ学習の場合は与えられたデータを利用することのみを考えればよいですが、オンライン学習では局所最適解に陥ることを防ぐため**探索と活用のトレードオフ**（*exploration-exploitation trade-off*）を考慮しながらデータを収集することになります。
 
 ### MDPの表現の統一
 
