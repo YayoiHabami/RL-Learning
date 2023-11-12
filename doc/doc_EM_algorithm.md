@@ -79,7 +79,7 @@ $$\mathcal{L}=p^3(1-p)^2$$
 
 > ベルヌーイ分布（*Bernoulli distribution*）：確率 $p$ で１を、確率 $1-p$ で０をとる離散確率分布。すなわち
 >
-> $$P(X=1)=p, P(X=0)=1-p$$
+> $$\mathrm{Pr}(X=1)=p, \mathrm{Pr}(X=0)=1-p$$
 
 この尤度関数を最大化する $\theta$ は $\pmb{x}$ の関数として与えられるので、これを ${\hat\theta}^*(\pmb{x})$ と書くとき、 ${\hat\theta}^*={\hat\theta}^*(\pmb{X})$ を**最尤推定量**（*maximum likelihood estimator*; MLE）と言います。以下では、最尤推定量を指すことが明らかである場合には ${\hat\theta}^*={\hat\theta}^*(\pmb{X})$ の代わりに $\theta^*=\theta^*(\pmb{X})$ を用いることにします。
 

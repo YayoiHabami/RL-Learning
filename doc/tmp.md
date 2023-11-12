@@ -38,13 +38,18 @@
 | $\mathcal{X}$ |実現値の取りうる値の集合 <br>例）６面さいころでは $x \in \mathcal{X}=\{1,2,3,4,5,6\}$ | 
 | $\mathrm{Pr}(X)$ | $X$ の確率 |
 | $\mathbb{E}[X]$ | $X$ の期待値 |
+| $\mathrm{KL}[p\|\|q]$ | 確率分布 $p$ と $q$ のKL情報量（*Kullback-Leivler divergence*） |
 | $s,s_t,S,S_t,\mathcal{S}$ | それぞれ状態（の実現値） $s$ 、状態変数 $S$ （時間ステップ $t$ で $s_t,S_t$ ）、全状態の集合 $\mathcal{S}$ |
 | $a,a_t,A,A_t,\mathcal{A}$ | それぞれ行動（の実現値） $a$ 、行動変数 $A$ （時間ステップ $t$ で $a_t,A_t$ ）、全行動の集合 $\mathcal{A}$ |
-| $\pi,\pmb{\pi}$| 定常な方策： $\pi$  / 非定常な（すなわち時間ステップ $t$ により変化するような）方策： $\pmb{\pi}$ <br> $\pmb{\pi}$ を（定常非定常問わず）方策の系列とみることもあります
-| $\pi^*,\pmb{\pi}^*$ | 最適方策 |
-| $r,r_t,R,R_t$ | 報酬関数 $r$ 、（時間ステップ $t$ の）報酬値 $R,R_t\in\R$ <br>時間ステップ $t$ の報酬値を $r_t$ として表記する場合もあります
+| $\tau$ | MDP/POMDPの軌跡; 状態 $s_t$ と行動 $a_t$ の系列 $\{s_0,a_0,s_1,a_1,...\}$ など
+| $\pi,\pmb{\pi}$| それぞれ定常な方策： $\pi$  / 非定常な（すなわち時間ステップ $t$ により変化するような）方策： $\pmb{\pi}$ <br> $\pmb{\pi}$ を（定常非定常問わず）方策の系列とみることもあります
+| $x^*$ | 最適な $x$ ; 最適方策 $\pi^*$ など |
+| $r,r_t,R,R_t$ | それぞれ報酬関数 $r$ 、（時間ステップ $t$ の）報酬値 $R,R_t\in\R$ <br>時間ステップ $t$ の報酬値を $r_t$ として表記する場合もあります |
+| $\gamma$ | 割引率 $\gamma\in [0,1)$ |
 | $\mathcal{J},\mathcal{J}(\pmb{\pi})$ | （方策 $\pmb{\pi}$ に従う）目的関数
 | $\mathrm{M},\mathrm{M}(\pmb{\pi})$ | $(\mathcal{S,A},p_{s_0},p_{T},r)$ の組などで決定されるマルコフ決定過程;<br> $p_{s_0}\colon \mathcal{S}\to[0,1]$ : 初期状態確率、 $p_T\colon \mathcal{S\times S\times A}\to [0,1]$ : 状態遷移確率関数、 $r\colon\mathcal{S\times A}\to\R$ : 報酬関数
+| $V^\pi(s)$ | 価値関数 $V^\pi\colon\mathcal{S}\to\mathbb{R}$|
+| $Q^\pi(s,a)$ | 行動価値関数 $Q^\pi\colon\mathcal{S\times A}\to\mathbb{R}$ ; Q関数
 
 > ペアノの公理的には $\N$ に $0$ が自明的に含まれてもいいとは思いますが、使い分けをしたい時もあることを考えて $\N$ を $\{1,2,...\}$ 、 $\N_0$ を $\{0,1,...\}$ と定義します。
 
@@ -95,9 +100,9 @@ $$p_i\propto \exp \left(-\frac{\varepsilon_i}{kT}\right)$$
 
 情報処理の文脈では、コスト関数をエネルギー $\varepsilon$ とみなして、ボルツマン分布を
 
-$$\mathrm{P}(\varepsilon)=\frac{1}{Z}\exp\left(-\frac{\varepsilon}{T}\right)$$
+$$\mathrm{Pr}(\varepsilon)=\frac{1}{Z}\exp\left(-\frac{\varepsilon}{T}\right)$$
 
-として定義することが多いです[A2]。分母 $Z$ は正規化定数であり、全状態について $P(\varepsilon)$ を積分することで計算されます。また、温度 $T$ はパラメタとして与えることができます。
+として定義することが多いです[A2]。分母 $Z$ は正規化定数であり、全状態について $\mathrm{Pr}(\varepsilon)$ を積分することで計算されます。また、温度 $T$ はパラメタとして与えることができます。
 
 <img src="imgs/ボルツマン分布（情報処理）.png" width=400>
 
@@ -118,7 +123,7 @@ $$\mathcal{X}=\{x_0,x_1,...\}, \mathcal{Y}=\{y_0,y_1,...\}$$
 
 上で値を取る場合を考えます。このとき、 $(X,Y)$ の組の実現値が $(x_i,x_j)$ となる確率の関数、**同時確率**（*joint probability*）関数を
 
-$$P(X=x_i,Y=y_j)=p_{X,Y}(x_i,y_i)$$
+$$\mathrm{Pr}(X=x_i,Y=y_j)=p_{X,Y}(x_i,y_i)$$
 
 として定義します。このとき、同時確率 $p_{X,Y}(x_i,y_i)$ は
 
