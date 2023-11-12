@@ -11,7 +11,7 @@
 - [方策](#方策)
   - [方策の分類](#方策の分類)
   - [方策の要素数](#方策の要素数)
-  - [方策の妥当性](#方策の妥当性)
+  - [方策の十分性](#方策の十分性)
 - [定式化](#定式化)
   - [概観：逐次的意思決定問題](#概観逐次的意思決定問題)
   - [MDPの表現の統一](#mdpの表現の統一)
@@ -45,7 +45,7 @@ $$\mathrm{Pr}(X_{t+k}=x|X_s=x_s,\forall s\leq t)=\mathrm{Pr}(X_{t+k}=x|X_t=x_t)$
 
 ### マルコフ決定過程
 
-強化学習においては何らかの選択や行動を行いますから、その**行動**（action）と、その良し悪しを判断させるための**報酬**（reward）をマルコフ連鎖に加えます。このような過程を**マルコフ決定過程**（Markov decision process; MDP）と呼び、次の組 $(\mathcal{S,A},p_{s_0},p_T,g)$ で定義します[0]。
+強化学習においては何らかの選択や行動を行いますから、その**行動**（action）と、その良し悪しを判断させるための**報酬**（reward）をマルコフ連鎖に加えます。このような過程を**マルコフ決定過程**（Markov decision process; MDP）と呼び、次の組 $(\mathcal{S,A},p_{s_0},p_T,r)$ で定義します[0]。
 
 |名称|定義|
 |:-:|-|
@@ -54,19 +54,19 @@ $$\mathrm{Pr}(X_{t+k}=x|X_s=x_s,\forall s\leq t)=\mathrm{Pr}(X_{t+k}=x|X_t=x_t)$
 |初期状態確率関数| $p_{s_0}\colon\mathcal{S}\to[0,1]\colon p_{s_0}(s)\triangleq\mathrm{Pr}(S_0=s)$ |
 |状態遷移確率関数| $p_T\colon\mathcal{S\times S\times A}\to[0,1]\colon$ |
 |〃| $p_T(s'\|s,a)\triangleq\mathrm{Pr}(S_{t+1}=s'\|S_t=s,A_t=a),\space\forall t\in\mathbb{N}_0$ |
-|報酬関数| $g\colon\mathcal{S\times A}\to\mathbb{R}$ |
+|報酬関数| $r\colon\mathcal{S\times A}\to\mathbb{R}$ |
 
 > $\mathbb{N}_0 \coloneqq \mathbb{N}\cup\bold{0}$ 、 $|\mathcal{X}|$ は $\mathcal X$ の要素数としました。
 
 ここで、確率変数 $S_t$ と $A_t$ は時間ステップ $t\in\mathbb{N}_0$ での状態変数と行動変数を表します。上からわかるように、このMDPは「有限状態集合、有限行動集合の離散時間MDP」です。
 
-定義から、報酬関数 $g$ は有界関数（ $\infty$ に飛ばない）であり、
+定義から、報酬関数 $r$ は有界関数（ $\plusmn\infty$ に飛ばない）であり、
 
-$$|g(s,a)|\leq R_{max},\space\forall (s,a)\in\mathcal{S\times A}\tag 1$$
+$$|r(s,a)|\leq R_{max},\space\forall (s,a)\in\mathcal{S\times A}\tag 1$$
 
 を満たす $R_{max}\in\mathbb R$ が存在することを仮定していることになります。また、報酬の集合 $\mathcal R$ を次のように定義します。
 
-$$\mathcal{R}\triangleq\{r\in\mathbb{R}\colon r=g(s,a),\exist (s,a)\in\mathcal {S,A}\}$$
+$$\mathcal{R}\triangleq\{R\in\mathbb{R}\colon R=r(s,a),\exist (s,a)\in\mathcal {S,A}\}$$
 
 ここで、報酬にマイナスを掛けたものを**損失**（cost）と呼ぶことがありますが、累積損失の最小化を目的とした問題は累積報酬の最大化を目的とした問題と同様であることに注意したいです。
 
@@ -74,21 +74,21 @@ $$\mathcal{R}\triangleq\{r\in\mathbb{R}\colon r=g(s,a),\exist (s,a)\in\mathcal {
 
 $$\pi\colon\mathcal{A\times S}\to[0,1]\colon\pi(a|s)\triangleq\mathrm{Pr}(A=a|S=s)\tag2$$
 
-のように定義します。ここで、方策 $\pi$ を含めたMDP; $M$ を、
+のように定義します。ここで、方策 $\pi$ を含めたMDP; $\mathrm{M}$ を、
 
-$$M(\pi)\triangleq\{\mathcal{S,A},p_{s_0},p_T,g,\pi\}\tag3$$
+$$\mathrm{M}(\pi)\triangleq\{\mathcal{S,A},p_{s_0},p_T,r,\pi\}\tag3$$
 
 と表記することにします。また（すべての）方策を含む方策集合 $\Pi$ を次のように定義します。
 
 $$\Pi\triangleq\left\{\pi\colon\mathcal{A\times S}\to[0,1]\colon\sum_{a\in\mathcal A}\pi(a|s)=1,\space\forall s\in\mathcal S\right\}$$
 
-最後に、マルコフ決定過程 $M(\pi)$ がどのようにステップを進めるかについて下記に示します。
+最後に、マルコフ決定過程 $\mathrm{M}(\pi)$ がどのようにステップを進めるかについて下記に示します。
 
-> マルコフ決定過程 $M(\pi)=\{\mathcal{S,A},p_{s_0},p_T,g,\pi\}$
+> マルコフ決定過程 $\mathrm{M}(\pi)=\{\mathcal{S,A},p_{s_0},p_T,r,\pi\}$
 >
 > 0. 時間ステップ $t=0$ で初期化を行い、（初期状態確率 $p_{s_0} に従い）初期状態 $s_t\space(\sim p_{s_0})$ を決定する
 > 1. 状態 $s_t$ と 方策 $\pi(\cdot|s_t)$ から、行動 $a_t$ を選択する
-> 2. 行動 $a_t$ に対する報酬 $r_t=g(s_t,a_t)$ を受け取る
+> 2. 行動 $a_t$ に対する報酬 $R_t=r(s_t,a_t)$ を受け取る
 > 3. 現在の状態 $s_t$ と行動 $a_t$ から状態遷移確率 $p_T(\cdot|s_t,a_t)$ により、状態を次の $s_{t+1}$ へ遷移させる
 > 4. 時間ステップを $t$ から $t+1$ に進め、1. に戻る
 
@@ -106,7 +106,7 @@ $$\Pi\triangleq\left\{\pi\colon\mathcal{A\times S}\to[0,1]\colon\sum_{a\in\mathc
 - **マルコフ性**の有無（無し：履歴依存）
 - **決定的**か**確率的**か
 
-および方策の最適化を容易にするために極力小さい集合（*subset*; 部分集合）の方策を取り扱いたいこと、の２点を理解できれば十分だと思います。
+および方策の最適化を容易にするために極力小さい集合（*subset*; 部分集合）の方策を取り扱いたいこと、大きくても非定常のマルコフ方策で十分であること、の３点を理解できれば十分だと思います。
 
 ### 方策の分類
 
@@ -192,15 +192,48 @@ $$\Pi_t^{h,d}\triangleq\{\pi^{h,d}\colon\mathcal{H}_t\to\mathcal{A}\}$$
 | $\|\pmb{\Pi}^{\mathrm{MD}}_{0:T}\|$ | $2^2$ | $2^4$ | $2^6$ | $2^8$ | $=256$ |
 | $\|\pmb{\Pi}^{\mathrm{HD}}_{0:T}\|$ | $2^2$ | $2^{10}$ | $2^{42}$ | $2^{170}$ | $\simeq 10^{51}$ |
 
-表１を見ると、より上位の集合ほど（*superset*; 図１）その要素数が爆発的に増大しています。上表で取り扱ったのはごく小規模のMDPでしたが、これですらも上位の方策系列の集合を対象とするのは現実的でないことがわかります。
+表１を見ると、より上位の集合ほど（*superset*; 図１or式 $(13)$ ）その要素数が爆発的に増大しています。上表で取り扱ったのはごく小規模のMDPでしたが、これですらも上位の方策系列の集合を対象とするのは現実的でないことがわかります。したがって、できるだけ下位の方策集合（*subset*; 部分集合）を対象にして探索を行う必要があると言えます。
 
-### 方策の妥当性
+> ある時間ステップ $t$ で到達確率が $0$ である状態 $s_t\in\mathcal{S}$ や、発生確率が $0$ になるような履歴 $h_t\in\mathcal{H}_t$ が存在する可能性があり、その下ではそれぞれの集合のサイズを小さくすることができます。これらは初期状態確率 $p_{s_0}$ や状態遷移確率 $p_T$ によりますが、依然として大小関係 $|\pmb{\Pi}^{\mathrm{SD}}|\leq|\pmb{\Pi}^{\mathrm{MD}}_{0:T}|\leq |\pmb{\Pi}^{\mathrm{HD}}_{0:T}|$ は変わりません。
+
+### 方策の十分性
+
+任意のMDP $\mathrm{M}=\{\mathcal{S,A},p_{s_0},p_T,r\}$ と履歴依存の方策系列 $\pmb{\pi}^h=\{\pi^h_0,\pi^h_1,...\}\in\pmb{\Pi}^\mathrm{H}$ に対して、次をみたすようなマルコフ方策の系列 $\pmb{\pi}^m=\{\pi_0^m,\pi_1^m,...\}\in\pmb{\Pi}^\mathrm{M}$ が存在します。
+
+$$\begin{aligned}\mathrm{Pr}(S_t=s,A_t=a|\mathrm{M}(\pmb{\pi}^h))=\mathrm{Pr}(S_t=s,A_t=a|\mathrm{M}(\pmb{\pi}^m)),&\\\forall (t,s,a)\in\N_0\times\mathcal{S\times A}&\end{aligned}\tag{15}$$
+
+詳細は省きますが、行動選択確率 $\pi_t^{m*}(a|s)\coloneqq \frac{\mathrm{Pr}(S_t=s,A_t=a|\mathrm{M}(\pmb{\pi}^h))}{\mathrm{Pr}(S_t=s|\mathrm{M}(\pmb{\pi}^h))},\forall a\in\mathcal{A}$ をもつマルコフ方策系列 $\pmb{\pi}^{m*}$ を定義し、$\sum_{s\in\mathcal{S}_0}\mathrm{Pr}(S_t=s|\mathrm{M}(\pmb{\pi}^h))=1,\forall t\in\N_0$ を用いて帰納法から式 $(16)$ が成り立つことを示せば証明は可能です。また、状態を観測に置き換えても上の議論は成立することから、POMDPにおいても同様の議論が可能です。
+
+式 $(15)$ から、各時間ステップ $t$ での $S_t,A_t$ の同時確率については、（履歴依存）非マルコフ方策とマルコフ方策において等しいことがわかりました。ただし、系列全体 $(S_0,A_0,...,S_t,A_t)$ の同時確率については必ずしも一致するとは限りません。
+
+次に、同時周辺確率関数 $\varphi^{\pmb{\pi}}_t\colon\mathcal{S\times A\times S}\to [0,1]$ を
+
+$$\begin{aligned}\varphi^{\pmb{\pi}}_t(s,a|s_0)\triangleq&\mathrm{Pr}(S_t=s,A_t=a|S_0=s_0,\mathrm{M}(\pmb{\pi}))\\=&\mathbb{E}\left[\mathbb{I}_{\{S_t=s\}}\mathbb{I}_{\{A_t=a\}}|S_0=s_0,\mathrm{M}(\pmb{\pi})\right]\end{aligned}$$
+
+と定義します。同時周辺確率の系列 $\varphi^{\pmb{\pi}}_0,\varphi^{\pmb{\pi}}_1,...$ の関数 $\tilde{f}$ を用いて、任意の方策 $\pmb{\pi}\in\pmb{\Pi}^\mathrm{H}$ の目的関数 $f$ を
+
+$$f(\pmb{\pi})=\tilde{f}(\varphi^{\pmb{\pi}}_0,\varphi^{\pmb{\pi}}_1,...)\tag{17}$$
+
+と書けるとき、次式が成立します。
+
+$$\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{M}}f(\pmb{\pi})=\max_{\pmb{\pi}\in\pmb{\Pi}^\mathrm{H}} f(\pmb{\pi})\tag{18}$$
+
+ここから、式 $(17)$ で書ける目的関数を用いる場合、（履歴依存の方策系列を探索対象とする必要はなく）マルコフ方策系列のみを対象とすればよいことがわかります。一般に目的関数として用いられる期待累積報酬や、期待割引累積報酬は式 $(17)$ のようにかくことができ、最適化対象をマルコフ方策 $\pmb{\Pi}^\mathrm{H}$ のみとして最適化問題を解けばよいことがわかります。
+
+> 式 $(17)$ のように書けない関数として、累積報酬の**中央値**（*median*）や**分位点**（*quantile*）などがあります。
+
+> 例）時間ステップ長 $T$ のMDPにおける期待累積報酬を考えると
+>
+> $$\begin{aligned}\mathcal{J}(\pmb{\pi})=\mathbb{E}^{\pmb\pi}\left[\sum_{t=0}^T{R_t}\right]=&\mathbb{E}^{\pmb{\pi}}\left[\sum_{t=0}^T r(S_t,A_t)\right]\\
+=&\sum_{t=0}^T\mathbb{E}^{\pmb{\pi}}\big[r(S_t,A_t)\big]\\
+=&\sum_{t=0}^T\sum_{s\in\mathcal{S}}\sum_{a\in\mathcal{A}}\sum_{s_0\in\mathcal{S}}{p_{s_0}(s_0)\varphi^{\pmb{\pi}}_t(s,a|s_0)r(s,a)}\\
+=&\tilde{f}(\varphi^{\pmb{\pi}}_0,...,\varphi^{\pmb{\pi}}_T)\end{aligned}$$
 
 ## 定式化
 
 ### 概観：逐次的意思決定問題
 
-逐次的意思決定問題の学習においては方策 $\pi$ のみを調整します。環境（MDPの場合は $\{\mathcal{S,A},p_{s_0},p_T,g\}$ ）は一般に時間不変であり、最初に課題を設定した時点で決定されます。環境のモデルが既知である場合（モデルベース）はそれ自体から方策を最適化することが可能であり、このようなケースは**学習**（*learning*）の代わりに**プランニング**（*planning*）とよぶことも多いです。プランニングの場合に用いられる基礎的な最適化手法としては動的計画法や線形計画法などがあります。
+逐次的意思決定問題の学習においては方策 $\pi$ のみを調整します。環境（MDPの場合は $\{\mathcal{S,A},p_{s_0},p_T,r\}$ ）は一般に時間不変であり、最初に課題を設定した時点で決定されます。環境のモデルが既知である場合（モデルベース）はそれ自体から方策を最適化することが可能であり、このようなケースは**学習**（*learning*）の代わりに**プランニング**（*planning*）とよぶことも多いです。プランニングの場合に用いられる基礎的な最適化手法としては動的計画法や線形計画法などがあります。
 
 一方環境のモデルが未知である場合はデータからの学習が必要です。バッチ学習の場合は与えられたデータを利用することのみを考えればよいですが、オンライン学習では局所最適解に陥ることを防ぐため**探索と活用のトレードオフ**（*exploration-exploitation trade-off*）を考慮しながらデータを収集することになります。
 
@@ -248,13 +281,13 @@ $$|C_t|\leq \sum_{k=0}^\infty{\gamma^k R_{max}}=\frac{R_{max}}{1-\gamma},\space\
 
 ### 目的関数
 
-上に述べたように、逐次的意思決定問題では最適化のためにリターンについて何らかの最大化を行います。ここで、方策 $\pmb{\pi}$ に基づくMDP $M(\pmb\pi)$ のもとで、統計量 $\mathcal{F}[C|M(\pmb\pi)]$ について
+上に述べたように、逐次的意思決定問題では最適化のためにリターンについて何らかの最大化を行います。ここで、方策 $\pmb{\pi}$ に基づくMDP $\mathrm{M}(\pmb\pi)$ のもとで、統計量 $\mathcal{F}[C|\mathrm{M}(\pmb\pi)]$ について
 
-$$\mathcal{J}(\pmb\pi)\triangleq\mathcal{F}[C|M(\pmb\pi)]$$
+$$\mathcal{J}(\pmb\pi)\triangleq\mathcal{F}[C|\mathrm{M}(\pmb\pi)]$$
 
 を満たすような関数 $\mathcal{J}\colon\pmb{\Pi}\to\R$ を考えます。この関数を**目的関数**（*objective function*）といい、方策についての最適化問題はこの関数や制約条件の下で解かれることになります。制約条件なしの下では、逐次的意思決定問題は
 
-$$\pmb{\pi}^*\triangleq\argmax_{\pmb{\pi}\in\Pi}{f(\pmb\pi)}$$
+$$\pmb{\pi}^*\triangleq\argmax_{\pmb{\pi}\in\pmb{\Pi}}{f(\pmb\pi)}$$
 
 の探索問題と解釈できます。
 
