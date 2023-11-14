@@ -13,17 +13,13 @@
   - [補足：ノンパラメトリック](#補足ノンパラメトリック)
   - [ボルツマン分布](#ボルツマン分布)
     - [参考文献](#参考文献)
-  - [同時確率・周辺確率](#同時確率周辺確率)
-    - [離散分布の場合](#離散分布の場合)
-    - [連続分布の場合](#連続分布の場合)
-    - [参考文献](#参考文献-1)
   - [価値関数・行動関数の記法](#価値関数行動関数の記法)
-    - [参考文献](#参考文献-2)
+    - [参考文献](#参考文献-1)
   - [リプレイバッファ（TF-Agents）](#リプレイバッファtf-agents)
     - [TF-Agentsライブラリ](#tf-agentsライブラリ)
     - [経験のリプレイ（*Experience Replay*）](#経験のリプレイexperience-replay)
     - [実装：リプレイバッファ](#実装リプレイバッファ)
-    - [参考文献](#参考文献-3)
+    - [参考文献](#参考文献-2)
 
 ## 記法の定義
 
@@ -112,52 +108,6 @@ $$\mathrm{Pr}(\varepsilon)=\frac{1}{Z}\exp\left(-\frac{\varepsilon}{T}\right)$$
 [A1] [Boltzmann distribution](https://en.wikipedia.org/wiki/Boltzmann_distribution)
 
 [A2] [Boltzmann分布](https://ibisforest.org/index.php?Boltzmann%E5%88%86%E5%B8%83)
-
-### 同時確率・周辺確率
-
-#### 離散分布の場合
-
-2つの確率変数 $X,Y$ の組 $(X,Y)$ を考えると、その確率分布は２次元平面 $\R^2$ 上に分布することになります。はじめに、 $X,Y$ が離散型確率変数である場合、すなわち
-
-$$\mathcal{X}=\{x_0,x_1,...\}, \mathcal{Y}=\{y_0,y_1,...\}$$
-
-上で値を取る場合を考えます。このとき、 $(X,Y)$ の組の実現値が $(x_i,x_j)$ となる確率の関数、**同時確率**（*joint probability*）関数を
-
-$$\mathrm{Pr}(X=x_i,Y=y_j)=p_{X,Y}(x_i,y_i)$$
-
-として定義します。このとき、同時確率 $p_{X,Y}(x_i,y_i)$ は
-
-- $p_{X,Y}(x_i,y_i)\geq 0$
-- $\sum_{(x_i,y_i)\in\mathcal{X\times Y}}p_{X,Y}(x_i,y_i)=1$
-
-を満たします。
-
-次に、すべての $Y$ の値について総和をとり、 $X$ のみについての確率を考えると、
-
-$$p_X(x_i)=\sum_{y_j\in\mathcal{Y}}p_{X,Y}(x_i,y_i)$$
-
-が定義されます。このように事象（変数）の確率の和（積分）をとることを**周辺化**ともいい、これを $X$ の**周辺確率**（*marginal probability*）関数といい、 $Y$ についても同様に定義されます。
-
-下図におみくじを例にした離散確率における同時確率と周辺確率のイメージを示します。
-
-<img src="imgs/周辺確率・同時確率.png" width=400>
-
-#### 連続分布の場合
-
-次に $X,Y$ が $\R$ 上の連続な確率変数である場合を考えます。離散分布の場合と同様に、**同時確率密度**（*joint probability density*）関数 $f_{X,Y}(x,y)$ は、
-
-- $f_{X,Y}(x,y)\geq 0$
-- $\int_{-\infty}^\infty\int_{-\infty}^\infty f_{X,Y}(x,y)dxdy=1$
-
-を満たします。また、同様に $X$ の**周辺確率密度**（*marginal probability density*）関数は
-
-$$f_X(x)=\int_{-\infty}^\infty f_{X,Y}(x,y)dy$$
-
-で定義されます。
-
-#### 参考文献
-
-[A1] 統計学-Statistics, 久保川達也, 国友直人, 東京大学出版会, 第2刷（第８章）
 
 ### 価値関数・行動関数の記法
 
