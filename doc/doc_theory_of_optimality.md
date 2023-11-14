@@ -37,7 +37,7 @@ $$\theta \pmb{x}_1+(1-\theta)\pmb{x}_2\in X,\space\forall \pmb{x}_1,\pmb{x}_2\in
 **凸関数**（*convex function*）とは、 $f(x)=x^2$ のような、曲面上の任意の2点を結ぶ線分が関数の上に存在するような関数です。いわゆる「下に凸な関数」と言えると思います。より正確には、 凸集合 $X\subset \R^n$ 上で定義される関数 $f\colon X\to \R^1$ に対して、 
 
 $$\begin{aligned}&\theta f(\pmb{x}_1)+(1-\theta)f(\pmb{x}_2)\geq f\big(\theta \pmb{x}_1+(1-\theta)\pmb{x}_2\big)\\
-&s.t.\space\forall \pmb{x}_1,\pmb{x}_2\in X\space\forall\theta\in [0,1]
+&s.t.\space\forall \pmb{x}_1,\pmb{x}_2\in X,\space\forall\theta\in [0,1]
 \end{aligned}$$
 
 が成り立つような関数です（ $n=2$ のときのイエンゼンの不等式）[2]。また、$-f$ が凸関数である場合にこれを**凹関数**（*concave function*）といいます。

@@ -154,9 +154,10 @@ $$\left\{\begin{aligned}Q_t(s,a)=&r(s,a)+\mathrm{soft}\max_{s'} V_{t+1}(s')\\V_t
 
 $$\begin{aligned}\mathrm{Pr}(A_t=a|S_t=s,e_{t\colon T}=1)=&\frac{\mathrm{Pr}(e_{t\colon T}=1|A_t=a,S_t=s)\mathrm{Pr}(A_t=a|S_t=s)}{\mathrm{Pr}(e_{t\colon T}=1|S_t=s)}\\
 =&\frac{e^{Q_t(s,a)}C}{e^{V_t(s)}}\\
-\propto &\exp(Q_t(s,a)-V_t(s))\end{aligned}$$
+\propto &\exp(Q_t(s,a)-V_t(s))\\
+\propto &\exp(A_\pi(s,a))\end{aligned}$$
 
-すなわち、ソフト価値関数を計算できれば、最適方策を $\exp(Q_t(s,a)-V_t(s))$ として求めることができます。
+ここで、 $A_\pi(s,a)$ はアドバンテージ関数です。すなわち、ソフト価値関数を計算できれば、最適方策を $\exp(Q_t(s,a)-V_t(s))$ として求めることができます。
 
 ### 近似推論
 
