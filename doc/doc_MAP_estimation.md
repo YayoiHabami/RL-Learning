@@ -86,14 +86,32 @@ $$\begin{aligned}\hat\theta_{MAP}=&\argmax_\theta{p(\theta|\pmb{X})}\\
 
 と書けます。最尤推定法では第一項の対数尤度 $\log{p(\pmb{X}|\theta)}$ のみを最大化しました。MAP推定ではこれに加えて対数事前確率 $p(\theta)$ も最大化しますが、これにより最尤推定解が事前確率の大きいほうに補正されます。
 
-
-
 > *maximum a posteriori* の意味
 >
 > *a posteriori* は「より後のものから」を意味するラテン語です。条件付き確率の一種である事後確率はその英名を *posterior probability* ということから、 *maximum a posteriori* は単純に最大の事後確率であることがわかります。
+
+### EMアルゴリズムによるMAP推定
+
+復習になりますが、 $t$ 回目のステップで得られる推定値を $\theta^{(t)}$ （初期値は $\theta^{(0)}$ ）とすれば、EMアルゴリズムは次のように表せます。
+
+> **E-step**：Q関数の計算<br>　 $y$ と $\theta^{(t)}$ のもとで $Q(\theta|\theta^{(t)})$ を計算
+>
+> **M-step**：上を $\theta$ について最大化<br>　 $\forall \theta\in\Omega_\theta$ に対し $Q(\theta^{(t+1)}|\theta^{(t)})\geq Q(\theta|\theta^{(t)})$ となる $\theta^{(t+1)}$ を算出
+>
+> $$\theta^{(t+1)}=\argmax_{\theta\in\Omega_\theta}Q(\theta|\theta^{(t)})$$
+
+ここで、Q関数は次の式で定義される、事後分布 $\ell_c(\theta')=\ln f(x|\theta')$ による対数尤度の期待値でした。
+
+$$Q(\theta|\theta')=\mathbb{E}\left[\ell_c(\theta')|y,\theta\right]=\int_{\Omega_Z}{\ell_c(\theta')f(z|y,\theta)dz}$$
+
+上に述べたように最頻値
+
+
  
 ## 参考文献
 
 [1] 入門統計学 第2版, 栗原伸一, オーム社, 第1刷
 
 [2] 機械学習のための確率と統計, 杉山将, 講談社, 第1刷
+
+[3] [EMアルゴリズム徹底解説（おまけ）〜MAP推定の場合〜](https://qiita.com/kenmatsu4/items/d797bf6250eee5048865)
